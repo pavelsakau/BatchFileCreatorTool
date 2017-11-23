@@ -148,15 +148,20 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="BitmapHelper.h" />
+    <ClInclude Include="DndCustom.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TestModuleCtrl.h" />
+    <ClInclude Include="TestSetup.h" />
     <ClInclude Include="TestStack.h" />
     <ClInclude Include="Toolbar.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="BitmapHelper.cpp" />
+    <ClCompile Include="DndCustom.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="TestModuleCtrl.cpp" />
     <ClCompile Include="TestStack.cpp" />
     <ClCompile Include="Toolbar.cpp" />
   </ItemGroup>

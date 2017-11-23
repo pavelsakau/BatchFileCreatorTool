@@ -1,8 +1,8 @@
 #ifndef TEST_STACK_H_
 #define TEST_STACK_H_
 
-#include "wx/wx.h"
-#include "wx/listctrl.h"
+#include <wx/wx.h>
+#include <wx/listctrl.h>
 #include <wx/frame.h>
 #include <wx/dnd.h>
 
@@ -24,11 +24,12 @@ public:
 
 	void OnBeginDrag(wxListEvent& event);
 
-	void OnStackPaint(wxPaintEvent& event);
+	void OnItemSelect(wxListEvent& event);
 
 	void DoSmthng(wxCoord x, wxCoord y, const wxString& str);
 	void OnDrag(wxCoord x, wxCoord y);
 	void CleanupEmptyLine();
+	void AppendTestItem(const wxString& text);
 };
 
 #endif

@@ -112,7 +112,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 		wxString t_duration = wxString::Format(wxT("-t %i "), test.duration);
 		wxString tcpchunk = wxString::Format(wxT("-tcpchunk %i "), test.chunk);
 		wxString tcprandom = test.randUseCheck ? wxT("-tcprandom ") : wxT("");
-		wxString f_filename = test.GetReportFilenameForPublish();
+		wxString f_filename = wxString::Format(wxT("-f %s "), test.GetReportFilenameForPublish());
 		wxString s_silent = wxT("-s ");
 
 		wxString command;

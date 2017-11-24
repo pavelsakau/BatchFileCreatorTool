@@ -148,6 +148,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 	}
 
 	cmdFile.Close();
+	wxMessageBox(wxString::Format(wxT("Publish to %s complete"), cmdFilename.GetFullPath()));
 }
 
 void MainWindow::PerformCopy(wxFileName exeFilename) {

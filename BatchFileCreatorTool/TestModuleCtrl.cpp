@@ -121,6 +121,10 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	wxBoxSizer* codecSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticText* codecLabel = new wxStaticText(codec, wxID_ANY, wxT("Codec"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	codecText = new wxChoice(codec, wxID_ANY);
+	const char* CodecNames[27] = {"G.711 (64kbits)", "G.729 (8kbps)", "G.723.1 (6.3kbps)", "G.723.1 (5.3kbps)", "G.726 (32kbps)", "G.726 (24kbps)", "G.728 (16kbps)", "T.38 (64kbps)",
+		"G.722 (64kbps)", "G.722 (56kbps)", "G.722 (48kbps)", "Bulk Data (64kbps)", "Bulk Data (1mbps)", "Skype: Silk (36k)", "Skype: Silk (26k)", "Skype: Silk (20k)",
+		"Skype: Silk (13k)", "Skype: Siren (16k)", "Skype: RTAudio (29k)", "Skype: RTAudio (11.8k)", "Skype: H.264 (240p)", "Skype: H.264 (480p)", "Skype: H.264 (720p)",
+		"Skype: H.264 (1080p)", "Skype: RTVideo (240p)", "Skype: RTVideo (480p)", "Skype: RTVideo (720p)"};
 	for (int i = 0; i < 27; i++) {
 		codecText->Append(wxString(CodecNames[i]));
 	}

@@ -1,99 +1,46 @@
 #include "MainWindow.h"
 #include "TestModuleCtrl.h"
-#include <wx/dirdlg.h>
-#include <wx/filefn.h> 
-#include <wx/filename.h>
-#include <wx/ffile.h>
 
 MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title, const wxPoint & pos, const wxSize & size, long style, const wxString & name)
-	: wxFrame(parent, id, title, pos, size, style, name), testCounter(1)
+	: wxFrame(parent, id, title, pos, size, style ^ wxRESIZE_BORDER, name), testCounter(1)
 {
 	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
 
 	toolbar = new Toolbar(this, wxT("Toolbar"));
 	toolbar->EnableTool(wxID_EXECUTE, false);
-	vbox->Add(toolbar, 0, wxTOP | wxEXPAND);
-
-	//wxBoxSizer* topControls = new wxBoxSizer(wxHORIZONTAL);
-
-	wxPanel* topPanel = new wxPanel(this, wxID_ANY);
-
-	wxBoxSizer* topLeftInputSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* serverAddrLabel = new wxStaticText(topPanel, wxID_ANY, wxT("TotalView server address"));
-	serverAddrText = new wxTextCtrl(topPanel, wxID_ANY);
-	topLeftInputSizer->AddStretchSpacer(1);
-	topLeftInputSizer->Add(serverAddrLabel, 5, wxLEFT | wxALIGN_LEFT | wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL);
-	topLeftInputSizer->AddStretchSpacer(1);
-	topLeftInputSizer->Add(serverAddrText, 15, wxLEFT);
-	topLeftInputSizer->AddStretchSpacer(1);
-
-	//wxBoxSizer* topRightInputSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* customNumberLabel = new wxStaticText(topPanel, wxID_ANY, wxT("Customer number"));
-	customNumberText = new wxTextCtrl(topPanel, wxID_ANY);
-	customNumberText->Enable(false);
-	//topRightInputSizer->AddStretchSpacer(1);
-	topLeftInputSizer->Add(customNumberLabel, 5, wxLEFT | wxALIGN_LEFT | wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL);
-	topLeftInputSizer->AddStretchSpacer(1);
-	topLeftInputSizer->Add(customNumberText, 15, wxLEFT);
-	topLeftInputSizer->AddStretchSpacer(30);
-
-	topPanel->SetSizer(topLeftInputSizer);
-
-	//topControls->Add(topLeftInputSizer, 1, wxALIGN_LEFT | wxEXPAND);
-	//topControls->Add(topRightInputSizer, 3, wxALIGN_RIGHT | wxEXPAND);
-
-	//vbox->Add(topLeftInputSizer, 0, wxALIGN_TOP | wxEXPAND);
-	vbox->Add(topPanel, 0, wxTOP | wxEXPAND);
+	vbox->Add(toolbar, 0, wxALIGN_TOP);
 
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	wxPanel* leftPanel = new wxPanel(this, wxID_ANY);
-
 	wxBoxSizer* stackBox = new wxBoxSizer(wxVERTICAL);
-	wxButton* addSimulationTestButton = new wxButton(leftPanel, wxID_ANY, "Add simulation test");
-	stack = new TestStack(leftPanel, wxT("TestStack"));
-	stackBox->Add(addSimulationTestButton, 0, wxTOP | wxALIGN_CENTER_HORIZONTAL | wxEXPAND);
-	stackBox->Add(stack, 1, wxALL | wxEXPAND);
+	wxButton* addSimulationTestButton = new wxButton(this, wxID_ANY, "Add simulation test");
+	stack = new TestStack(this, wxT("TestStack"));
+	stackBox->Add(addSimulationTestButton, 0, wxALIGN_CENTER_HORIZONTAL | wxEXPAND);
+	stackBox->Add(stack, 1, wxEXPAND);
 
-	leftPanel->SetSizer(stackBox);
-
-	mainSizer->Add(leftPanel, 1, wxALIGN_LEFT | wxEXPAND);
+	mainSizer->Add(stackBox, 1, wxALIGN_LEFT | wxEXPAND);
 
 	rightPanelWrapper = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* wrapperSizer =  new wxBoxSizer(wxHORIZONTAL);
-
-	//TestModuleCtrl* testCtrl = new TestModuleCtrl(rightPanelWrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, "Test #1");
-	//staticBoxId = testCtrl->GetId();
-	//wrapperSizer->Add((wxWindow*)testCtrl, 1, wxALL | wxEXPAND, 70);
-
 	rightPanelWrapper->SetSizer(wrapperSizer);
 
-	mainSizer->Add(rightPanelWrapper, 5, wxALIGN_RIGHT | wxEXPAND);
+	mainSizer->Add(rightPanelWrapper, 2, wxALIGN_LEFT | wxEXPAND);
 
-	vbox->Add(mainSizer, 1, wxALL | wxEXPAND);
+	vbox->Add(mainSizer, 1, wxEXPAND);
 
 	SetSizer(vbox);
 
 	addSimulationTestButton->Connect(wxEVT_BUTTON, wxCommandEventHandler(MainWindow::OnAddButtonClick), nullptr, this);
-	Connect(wxID_EXECUTE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainWindow::OnPublish));
-	leftPanel->Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(MainWindow::OnItemSelect), nullptr, this);
-	serverAddrText->Connect(wxEVT_TEXT, wxCommandEventHandler(MainWindow::ServerAddrTextChanged), nullptr, this);
+	Connect(wxID_EXECUTE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainWindow::OnPublish), nullptr, this);
+	Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(MainWindow::OnItemSelect), nullptr, this);
+	Connect(wxID_REMOVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnRemoveClick), nullptr, this);
 
 	testData.clear();
 }
 
-void MainWindow::ServerAddrTextChanged(wxCommandEvent& event)
-{
-	customNumberText->Enable(wxString("sub01.nlsubscription.com:443").CompareTo(serverAddrText->GetValue()) == 0);
-}
-
 void MainWindow::OnItemSelect(wxListEvent& event)
 {
-	wxString itemText = event.GetItem().GetText();
-	wxString idStr = itemText.substr(itemText.find('#') + 1, itemText.length() - itemText.find('#'));
-	int id;
-	idStr.ToLong((long*)&id);
-	LoadTestSetup(id);
+	LoadTestSetup(event.GetData());
 }
 
 void MainWindow::OnAddButtonClick(wxCommandEvent& event) {
@@ -102,10 +49,11 @@ void MainWindow::OnAddButtonClick(wxCommandEvent& event) {
 	
 	wxString nextStackName = GetNextTestName();
 
+	Freeze();
 	TestModuleCtrl* testCtrl = new TestModuleCtrl(this, rightPanelWrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, nextStackName);
-	staticBoxId = testCtrl->GetId();
-	sizer->Add((wxWindow*)testCtrl, 1, wxALL | wxEXPAND, 70);
+	sizer->Add((wxWindow*)testCtrl, wxSizerFlags(1).Border(wxALL, TEST_BORDER_WIDTH).Expand());
 	sizer->Layout();
+	Thaw();
 }
 
 void MainWindow::CleanRightPanelSizer()
@@ -123,6 +71,91 @@ void MainWindow::CleanRightPanelSizer()
 	}
 }
 
+wxString MainWindow::GetTestModeParam(int choice) {
+	char* params[] = {"end-to-end", "link-troubleshoot", "rtp-receiver", "rtp-transmit", "tcp-receiver", "tcp-transmit", "udp-firewall", "dscp-loss"};
+	return wxString(params[choice]);
+}
+
+wxString MainWindow::GetCodecParam(int codec) {
+	char* params[] = {"G.711(64)", "G.729(8)", "G.723.1(6.3)", "G.723.1(5.3)", "G.726(32)", "G.726(24)", "G.728(16)", "T.38(64)", "G.722(64)", "G.722(56)", "G.722(48)", 
+					  "Data64k", "Data1meg", "Skype.Silk(36)", "Skype.Silk(26)", "Skype.Silk(20)", "Skype.Silk(13)", "Skype.Siren", "Skype.RTAudio(29)", "Skype.RTAudio(11.8)", 
+					  "Skype.H264(240p)", "Skype.H264(480p)", "Skype.H264(720p)", "Skype.H264(1080p)", "Skype.RTVideo(240p)", "Skype.RTVideo(480p)", "Skype.RTVideo(720p)"};
+	return wxString(params[codec]);
+}
+
+wxString MainWindow::GetPortParam(const TestSetup& test) {
+	if (test.choice == 3) {
+		return wxString::Format(wxT("%i"), test.transmitUDP);
+	} else if (test.choice == 2) {
+		return wxString::Format(wxT("%i"), test.listenUDP);
+	} else if (test.choice == 5) {
+		return wxString::Format(wxT("%i"), test.transmitTCP);
+	} else {
+		return wxString::Format(wxT("%i"), test.listenTCP);
+	}
+}
+
+void MainWindow::PerformPublish(wxFileName cmdFilename) {
+	wxFFile cmdFile(cmdFilename.GetFullPath(), "w");
+
+	vector<int> order = stack->GetItemsOrder();
+
+	for (auto id : order) {
+		TestSetup test = testData[id];
+		wxString mode = wxString::Format("-mode %s ", GetTestModeParam(test.choice));
+		wxString a_address = wxString::Format("-a %s ", test.destinationIP);
+		wxString c_codec = wxString::Format("-c %s ", GetCodecParam(test.codec));
+		wxString n_calls = wxString::Format(wxT("-n %i "), test.numberOfCalls);
+		wxString delay = wxString::Format(wxT("-delay %i "), test.delay);
+		wxString port = wxString::Format("-port %s ", GetPortParam(test));
+		wxString dscp = test.dscpCheck ? wxString::Format(wxT("-dscp %i "), test.dscp) : wxT("");
+		wxString t_duration = wxString::Format(wxT("-t %i "), test.duration);
+		wxString tcpchunk = wxString::Format(wxT("-tcpchunk %i "), test.chunk);
+		wxString tcprandom = test.randUseCheck ? wxT("-tcprandom ") : wxT("");
+		wxString f_filename = test.GetReportFilenameForPublish();
+		wxString s_silent = wxT("-s ");
+
+		wxString command;
+		switch (test.choice) {
+		case 0:
+			command = mode + a_address + c_codec + n_calls + dscp + t_duration + f_filename + s_silent;
+			break;
+		case 1:
+			command = mode + a_address + delay + t_duration + f_filename + s_silent;
+			break;
+		case 2:
+			command = mode + port + s_silent; // RTP Receiver: remote name and enable dscp not used
+			break;
+		case 3:
+			command = mode + a_address + c_codec + n_calls + dscp + t_duration + port + f_filename + s_silent;
+			break;
+		case 4:
+			command = mode + port + s_silent; // TCP Receiver: remote name not used
+			break;
+		case 5:
+			command = mode + a_address + port + tcprandom + t_duration + tcpchunk + f_filename + s_silent;
+			break;
+		case 6:
+			command = mode + a_address + port + f_filename + s_silent;
+			break;
+		case 7:
+			command = mode + a_address + dscp + f_filename + s_silent;
+			break;
+		}
+
+		cmdFile.Write(wxString::Format(wxT("REM ********************************************** Test #%i **********************************************\n"), test.id));
+		cmdFile.Write(wxString::Format(wxT("CallSimulator.exe %s\n\n"), command));
+	}
+
+	cmdFile.Close();
+}
+
+void MainWindow::PerformCopy(wxFileName exeFilename) {
+	if (!wxCopyFile("CallSimulator.exe", exeFilename.GetFullPath())) {
+		wxMessageBox(wxString::Format(wxT("Can't copy CallSimulator.exe to %s"), exeFilename.GetFullPath()));
+	}
+}
+
 void MainWindow::OnPublish(wxCommandEvent& event) {
 	wxDirDialog dlg(NULL, "Choose save directory", "",	wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
 	if (dlg.ShowModal() == wxID_OK) {
@@ -131,13 +164,8 @@ void MainWindow::OnPublish(wxCommandEvent& event) {
 			if (::wxDirExists(path)) {
 				wxFileName cmdFilename(path, "CallSimBatch.cmd");
 				wxFileName exeFilename(path, "CallSimulator.exe");
-				wxFFile cmdFile(cmdFilename.GetFullPath(), "w");
-				cmdFile.Write(wxT("CallSimulator.exe\n"));
-				cmdFile.Close();
-				wxString a = exeFilename.GetFullName();
-				if (!wxCopyFile("CallSimulator.exe", exeFilename.GetFullPath())) {
-					wxMessageBox(wxString::Format(wxT("Can't copy CallSimulator.exe to %s"), exeFilename.GetFullPath()));
-				}
+				PerformPublish(cmdFilename);
+				PerformCopy(exeFilename);
 			} else {
 				wxMessageBox(wxString::Format(wxT("Can't open %s"), path));
 			}
@@ -149,13 +177,22 @@ wxString MainWindow::GetNextTestName() {
 	return wxString::Format(wxT("Test #%i"), testCounter++);
 }
 
+void MainWindow::OnRemoveClick(wxCommandEvent& event) {
+	int removedId = stack->RemoveSelected();
+	CleanRightPanelSizer();
+	if (testData.find(removedId) != testData.end()) {
+		testData.erase(removedId);
+	}
+}
+
 void MainWindow::SaveTestSetup(const TestSetup& test)
 {
 	if (testData.find(test.id) != testData.end()) {
 		testData[test.id] = test;
+		stack->UpdateTestItem(test);
 	} else {
 		testData.insert(pair<int, TestSetup>(test.id, test));
-		stack->AppendTestItem(wxString::Format(wxT("Test #%i"), test.id));
+		stack->AppendTestItem(test);
 	}
 	toolbar->EnableTool(wxID_EXECUTE, true);
 }
@@ -166,14 +203,15 @@ void MainWindow::LoadTestSetup(int id)
 		CleanRightPanelSizer();
 		wxSizer* sizer = rightPanelWrapper->GetSizer();
 
+		Freeze();
 		TestModuleCtrl* testCtrl = new TestModuleCtrl(this, rightPanelWrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, wxString::Format(wxT("Test #%i"), id));
-		staticBoxId = testCtrl->GetId();
-		sizer->Add((wxWindow*)testCtrl, 1, wxALL | wxEXPAND, 70);
+		sizer->Add((wxWindow*)testCtrl, 1, wxALL | wxEXPAND, TEST_BORDER_WIDTH);
 		sizer->Layout();
 
 		testCtrl->LoadTestSetup(testData[id]);
 		wxCommandEvent event;
-		event.SetId(testData[id].choice);
+		event.SetInt(testData[id].choice);
 		testCtrl->TestChoiceChanged(event);
+		Thaw();
 	}
 }

@@ -5,15 +5,19 @@
 #include <wx/listctrl.h>
 #include <wx/frame.h>
 #include <wx/dnd.h>
+#include <vector>
+#include "TestSetup.h"
+
+using namespace std;
 
 class TestStack : public wxPanel
 {
 private:
 	wxListCtrl* stack;
-	wxImage labelImage;
-	bool labelImageSet;
+	wxMenu* removePopupMenu;
 	int lastAstericsId;
 	wxString dragText;
+	int dragId;
 
 public:
 	TestStack(wxWindow* parent, const wxString& title);
@@ -26,10 +30,17 @@ public:
 
 	void OnItemSelect(wxListEvent& event);
 
-	void DoSmthng(wxCoord x, wxCoord y, const wxString& str);
+	void OnContextMenu(wxListEvent& event);
+	void OnRemoveClick(wxCommandEvent& event);
+
+	void DropItem(wxCoord x, wxCoord y, wxTextDataObject* obj);
 	void OnDrag(wxCoord x, wxCoord y);
 	void CleanupEmptyLine();
-	void AppendTestItem(const wxString& text);
+	void AppendTestItem(const TestSetup& test);
+	void UpdateTestItem(const TestSetup& test);
+	vector<int> GetItemsOrder();
+	wxString GetAppendStrFormat(const TestSetup& test);
+	int RemoveSelected();
 };
 
 #endif

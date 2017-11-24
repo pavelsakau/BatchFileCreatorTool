@@ -4,6 +4,7 @@
 #include <wx/choice.h>
 #include <wx/checkbox.h>
 #include <wx/datetime.h>
+#include <wx/tokenzr.h>
 
 const wxString TestModuleCtrl::END_TO_END_TEST_TEXT = wxT("End-to-End Test");
 const wxString TestModuleCtrl::LINK_TROUBLESHOOTING_TEST_TEXT = wxT("Link Troubleshooting Test");
@@ -21,10 +22,8 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 
 	wxPanel* testModePanel = new wxPanel(testStaticBox, wxID_ANY);
 	wxBoxSizer* testModeSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* testModeLabel = new wxStaticText(testModePanel, wxID_ANY, "Test mode", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	//wxStaticText* testModeLabel = new wxStaticText(testModePanel, wxID_ANY, "Test mode");
+	wxStaticText* testModeLabel = new wxStaticText(testModePanel, wxID_ANY, "Test mode", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 	testModeChoice = new wxChoice(testModePanel, wxID_ANY);
-	testModeChoice->SetColumns(1);
 	wxArrayString str;
 	str.Add(END_TO_END_TEST_TEXT);
 	str.Add(LINK_TROUBLESHOOTING_TEST_TEXT);
@@ -35,208 +34,178 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	str.Add(UDP_FIREWALL_TEST_TEXT);
 	str.Add(DSCP_LOSS_TEST_TEXT);
 	testModeChoice->Append(str);
-	testModeSizer->Add(testModeLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	testModeSizer->AddStretchSpacer(1);
-	testModeSizer->Add(testModeChoice, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	testModeSizer->AddStretchSpacer(25);
+	testModeSizer->AddStretchSpacer(10);
+	testModeSizer->Add(testModeLabel, wxSizerFlags(60).Align(wxALIGN_CENTER));
+	testModeSizer->Add(testModeChoice, wxSizerFlags(30).Align(wxALIGN_CENTER_VERTICAL).Expand());
+	testModeSizer->AddStretchSpacer(10);
 	testModePanel->SetSizer(testModeSizer);
 
-	testStaticSizer->Add(testModePanel, 10, wxALIGN_TOP | wxTOP | wxEXPAND);
+	testStaticSizer->Add(testModePanel, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 5).Expand());
+	testStaticSizer->AddSpacer(15);
 
-	wxPanel* bottomPanel = new wxPanel(testStaticBox, wxID_ANY);
 	wxBoxSizer* bottomPanelSizer = new wxBoxSizer(wxVERTICAL);
 
-	destinationIP = new wxPanel(bottomPanel, wxID_ANY);
+	destinationIP = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* destinationIPSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* destinationIPLabel = new wxStaticText(destinationIP, wxID_ANY, wxT("Destination IP"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+	wxStaticText* destinationIPLabel = new wxStaticText(destinationIP, wxID_ANY, wxT("Destination IP"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	destinationIPText = new wxTextCtrl(destinationIP, wxID_ANY, wxT("8.8.8.8"));
-	destinationIPSizer->Add(destinationIPLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	destinationIPSizer->AddStretchSpacer(1);
-	destinationIPSizer->Add(destinationIPText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	destinationIPSizer->AddStretchSpacer(25);
+	destinationIPSizer->Add(destinationIPLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	destinationIPSizer->Add(destinationIPText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	destinationIP->SetSizer(destinationIPSizer);
-	bottomPanelSizer->Add(destinationIP, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(destinationIP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	delay = new wxPanel(bottomPanel, wxID_ANY);
+	delay = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* delaySizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* delayLabel = new wxStaticText(delay, wxID_ANY, wxT("Delay"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	delayText = new wxTextCtrl(delay, wxID_ANY, wxT("100"));
-	delaySizer->Add(delayLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	delaySizer->AddStretchSpacer(1);
-	delaySizer->Add(delayText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	delaySizer->AddStretchSpacer(25);
+	wxStaticText* delayLabel = new wxStaticText(delay, wxID_ANY, wxT("Delay"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	delayText = new wxSpinCtrl(delay, wxID_ANY, wxT("100"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 1000, 100);
+	delaySizer->Add(delayLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	delaySizer->Add(delayText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	delay->SetSizer(delaySizer);
-	bottomPanelSizer->Add(delay, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(delay, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	remote = new wxPanel(bottomPanel, wxID_ANY);
+	remote = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* remoteSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* remoteLabel = new wxStaticText(remote, wxID_ANY, wxT("Remote Name"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+	wxStaticText* remoteLabel = new wxStaticText(remote, wxID_ANY, wxT("Remote Name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	remoteText = new wxTextCtrl(remote, wxID_ANY, wxT("Remote1"));
-	remoteSizer->Add(remoteLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	remoteSizer->AddStretchSpacer(1);
-	remoteSizer->Add(remoteText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	remoteSizer->AddStretchSpacer(25);
+	remoteSizer->Add(remoteLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	remoteSizer->Add(remoteText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	remote->SetSizer(remoteSizer);
-	bottomPanelSizer->Add(remote, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(remote, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	listenUDP = new wxPanel(bottomPanel, wxID_ANY);
+	listenUDP = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* listenUDPSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* listenUDPLabel = new wxStaticText(listenUDP, wxID_ANY, wxT("Listen UDP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	listenUDPText = new wxTextCtrl(listenUDP, wxID_ANY, wxT("5010"));
-	listenUDPSizer->Add(listenUDPLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	listenUDPSizer->AddStretchSpacer(1);
-	listenUDPSizer->Add(listenUDPText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	listenUDPSizer->AddStretchSpacer(25);
+	wxStaticText* listenUDPLabel = new wxStaticText(listenUDP, wxID_ANY, wxT("Listen UDP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	listenUDPText = new wxSpinCtrl(listenUDP, wxID_ANY, wxT("5010"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 2, 65534, 5010);
+	listenUDPSizer->Add(listenUDPLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	listenUDPSizer->Add(listenUDPText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	listenUDP->SetSizer(listenUDPSizer);
-	bottomPanelSizer->Add(listenUDP, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(listenUDP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	transmitUDP = new wxPanel(bottomPanel, wxID_ANY);
+	transmitUDP = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* transmitUDPSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* transmitUDPLabel = new wxStaticText(transmitUDP, wxID_ANY, wxT("Transmit UDP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	transmitUDPText = new wxTextCtrl(transmitUDP, wxID_ANY, wxT("5010"));
-	transmitUDPSizer->Add(transmitUDPLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	transmitUDPSizer->AddStretchSpacer(1);
-	transmitUDPSizer->Add(transmitUDPText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	transmitUDPSizer->AddStretchSpacer(25);
+	wxStaticText* transmitUDPLabel = new wxStaticText(transmitUDP, wxID_ANY, wxT("Transmit UDP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	transmitUDPText = new wxSpinCtrl(transmitUDP, wxID_ANY, wxT("5010"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 2, 65534, 5010);
+	transmitUDPSizer->Add(transmitUDPLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	transmitUDPSizer->Add(transmitUDPText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	transmitUDP->SetSizer(transmitUDPSizer);
-	bottomPanelSizer->Add(transmitUDP, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(transmitUDP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	destinationUDP = new wxPanel(bottomPanel, wxID_ANY);
+	destinationUDP = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* destinationUDPSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* destinationUDPLabel = new wxStaticText(destinationUDP, wxID_ANY, wxT("Destination UDP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	destinationUDPText = new wxTextCtrl(destinationUDP, wxID_ANY, wxT("5010"));
-	destinationUDPSizer->Add(destinationUDPLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	destinationUDPSizer->AddStretchSpacer(1);
-	destinationUDPSizer->Add(destinationUDPText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	destinationUDPSizer->AddStretchSpacer(25);
+	wxStaticText* destinationUDPLabel = new wxStaticText(destinationUDP, wxID_ANY, wxT("Destination UDP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	destinationUDPText = new wxSpinCtrl(destinationUDP, wxID_ANY, wxT("5010"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 2, 65534, 5010);
+	destinationUDPSizer->Add(destinationUDPLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	destinationUDPSizer->Add(destinationUDPText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	destinationUDP->SetSizer(destinationUDPSizer);
-	bottomPanelSizer->Add(destinationUDP, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(destinationUDP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	listenTCP = new wxPanel(bottomPanel, wxID_ANY);
+	listenTCP = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* listenTCPSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* listenTCPLabel = new wxStaticText(listenTCP, wxID_ANY, wxT("Listen TCP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	listenTCPText = new wxTextCtrl(listenTCP, wxID_ANY, wxT("5004"));
-	listenTCPSizer->Add(listenTCPLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	listenTCPSizer->AddStretchSpacer(1);
-	listenTCPSizer->Add(listenTCPText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	listenTCPSizer->AddStretchSpacer(25);
+	wxStaticText* listenTCPLabel = new wxStaticText(listenTCP, wxID_ANY, wxT("Listen TCP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	listenTCPText = new wxSpinCtrl(listenTCP, wxID_ANY, wxT("5004"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 2, 65534, 5004);
+	listenTCPSizer->Add(listenTCPLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	listenTCPSizer->Add(listenTCPText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	listenTCP->SetSizer(listenTCPSizer);
-	bottomPanelSizer->Add(listenTCP, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(listenTCP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	transmitTCP = new wxPanel(bottomPanel, wxID_ANY);
+	transmitTCP = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* transmitTCPSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* transmitTCPLabel = new wxStaticText(transmitTCP, wxID_ANY, wxT("Transmit TCP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	transmitTCPText = new wxTextCtrl(transmitTCP, wxID_ANY, wxT("5004"));
-	transmitTCPSizer->Add(transmitTCPLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	transmitTCPSizer->AddStretchSpacer(1);
-	transmitTCPSizer->Add(transmitTCPText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	transmitTCPSizer->AddStretchSpacer(25);
+	wxStaticText* transmitTCPLabel = new wxStaticText(transmitTCP, wxID_ANY, wxT("Transmit TCP port"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	transmitTCPText = new wxSpinCtrl(transmitTCP, wxID_ANY, wxT("5004"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 2, 65534, 5004);
+	transmitTCPSizer->Add(transmitTCPLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	transmitTCPSizer->Add(transmitTCPText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	transmitTCP->SetSizer(transmitTCPSizer);
-	bottomPanelSizer->Add(transmitTCP, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(transmitTCP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	codec = new wxPanel(bottomPanel, wxID_ANY);
+	codec = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* codecSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* codecLabel = new wxStaticText(codec, wxID_ANY, wxT("Codec"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	codecText = new wxTextCtrl(codec, wxID_ANY, wxT("G.711"));
-	codecSizer->Add(codecLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	codecSizer->AddStretchSpacer(1);
-	codecSizer->Add(codecText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	codecSizer->AddStretchSpacer(25);
+	wxStaticText* codecLabel = new wxStaticText(codec, wxID_ANY, wxT("Codec"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	codecText = new wxChoice(codec, wxID_ANY);
+	for (int i = 0; i < 27; i++) {
+		codecText->Append(wxString(CodecNames[i]));
+	}
+	codecText->SetSelection(0);
+	codecSizer->Add(codecLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	codecSizer->Add(codecText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	codec->SetSizer(codecSizer);
-	bottomPanelSizer->Add(codec, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(codec, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	numberOfCalls = new wxPanel(bottomPanel, wxID_ANY);
+	numberOfCalls = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* numberOfCallsSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* numberOfCallsLabel = new wxStaticText(numberOfCalls, wxID_ANY, wxT("Number of calls"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	numberOfCallsText = new wxTextCtrl(numberOfCalls, wxID_ANY, wxT("1"));
-	numberOfCallsSizer->Add(numberOfCallsLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	numberOfCallsSizer->AddStretchSpacer(1);
-	numberOfCallsSizer->Add(numberOfCallsText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	numberOfCallsSizer->AddStretchSpacer(25);
+	wxStaticText* numberOfCallsLabel = new wxStaticText(numberOfCalls, wxID_ANY, wxT("Number of calls"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	numberOfCallsText = new wxSpinCtrl(numberOfCalls, wxID_ANY, wxT("1"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 1000, 1);
+	numberOfCallsSizer->Add(numberOfCallsLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	numberOfCallsSizer->Add(numberOfCallsText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	numberOfCalls->SetSizer(numberOfCallsSizer);
-	bottomPanelSizer->Add(numberOfCalls, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(numberOfCalls, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	dscp = new wxPanel(bottomPanel, wxID_ANY);
+	dscp = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* dscpSizer = new wxBoxSizer(wxHORIZONTAL);
 	dscpCheck = new wxCheckBox(dscp, wxID_ANY, wxT("DSCP Tag"));
-	dscpText = new wxTextCtrl(dscp, wxID_ANY, wxT("46"));
-	dscpSizer->AddStretchSpacer(41);
-	dscpSizer->Add(dscpCheck, 9, wxRIGHT | wxALIGN_TOP | wxALIGN_RIGHT);
+	dscpText = new wxSpinCtrl(dscp, wxID_ANY, wxT("46"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 63, 46);
+	dscpSizer->AddStretchSpacer(50);
+	dscpSizer->Add(dscpCheck, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	dscpSizer->AddStretchSpacer(1);
-	dscpSizer->Add(dscpText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	dscpSizer->AddStretchSpacer(25);
+	dscpSizer->Add(dscpText, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
 	dscp->SetSizer(dscpSizer);
 	dscpCheck->SetValue(true);
-	bottomPanelSizer->Add(dscp, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(dscp, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	randUse = new wxPanel(bottomPanel, wxID_ANY);
+	randUse = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* randUseSizer = new wxBoxSizer(wxHORIZONTAL);
 	randUseCheck = new wxCheckBox(randUse, wxID_ANY, wxT("Random Usage Fluctuation"));
-	randUseSizer->AddStretchSpacer(47);
-	randUseSizer->Add(randUseCheck, 3, wxRIGHT | wxALIGN_TOP | wxALIGN_RIGHT);
-	randUseSizer->AddStretchSpacer(51);
+	randUseSizer->AddStretchSpacer(50);
+	randUseSizer->Add(randUseCheck, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	randUse->SetSizer(randUseSizer);
 	randUseCheck->SetValue(true);
-	bottomPanelSizer->Add(randUse, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(randUse, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	enableDSCP = new wxPanel(bottomPanel, wxID_ANY);
+	enableDSCP = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* enableDSCPSizer = new wxBoxSizer(wxHORIZONTAL);
 	enableDSCPCheck = new wxCheckBox(enableDSCP, wxID_ANY, wxT("Enable DSCP"));
-	enableDSCPSizer->AddStretchSpacer(51);
-	enableDSCPSizer->Add(enableDSCPCheck, 9, wxRIGHT | wxALIGN_TOP | wxALIGN_RIGHT);
-	enableDSCPSizer->AddStretchSpacer(51);
+	enableDSCPSizer->AddStretchSpacer(50);
+	enableDSCPSizer->Add(enableDSCPCheck, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	enableDSCP->SetSizer(enableDSCPSizer);
 	enableDSCPCheck->SetValue(true);
-	bottomPanelSizer->Add(enableDSCP, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(enableDSCP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	duration = new wxPanel(bottomPanel, wxID_ANY);
+	duration = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* durationSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* durationLabel = new wxStaticText(duration, wxID_ANY, wxT("Duration"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	durationText = new wxTextCtrl(duration, wxID_ANY, wxT("300"));
-	durationSizer->Add(durationLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	durationSizer->AddStretchSpacer(1);
-	durationSizer->Add(durationText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	durationSizer->AddStretchSpacer(25);
+	wxStaticText* durationLabel = new wxStaticText(duration, wxID_ANY, wxT("Duration"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	durationText = new wxSpinCtrl(duration, wxID_ANY, wxT("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000000, 300);
+	durationSizer->Add(durationLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	durationSizer->Add(durationText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	duration->SetSizer(durationSizer);
-	bottomPanelSizer->Add(duration, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(duration, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	chunk = new wxPanel(bottomPanel, wxID_ANY);
+	chunk = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* chunkSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* chunkLabel = new wxStaticText(chunk, wxID_ANY, wxT("Chunk size"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-	chunkText = new wxTextCtrl(chunk, wxID_ANY, wxT("1400"));
-	chunkSizer->Add(chunkLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	chunkSizer->AddStretchSpacer(1);
-	chunkSizer->Add(chunkText, 25, wxALIGN_TOP | wxALIGN_LEFT);
-	chunkSizer->AddStretchSpacer(25);
+	wxStaticText* chunkLabel = new wxStaticText(chunk, wxID_ANY, wxT("Chunk size"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	chunkText = new wxSpinCtrl(chunk, wxID_ANY, wxT("1400"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 64, 9500, 1400);
+	chunkSizer->Add(chunkLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	chunkSizer->Add(chunkText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	chunk->SetSizer(chunkSizer);
-	bottomPanelSizer->Add(chunk, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(chunk, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	report = new wxPanel(bottomPanel, wxID_ANY);
+	report = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* reportSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* reportLabel = new wxStaticText(report, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+	wxStaticText* reportLabel = new wxStaticText(report, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	reportText = new wxTextCtrl(report, wxID_ANY, wxT("End-to-End_8.8.8.8.htm"));
+	reportSizer->Add(reportLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	reportSizer->Add(reportText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 	reportText->Enable(false);
-	reportSizer->Add(reportLabel, 50, wxALIGN_TOP | wxALIGN_RIGHT);
-	reportSizer->AddStretchSpacer(1);
-	reportSizer->Add(reportText, 35, wxALIGN_TOP | wxALIGN_LEFT);
-	reportSizer->AddStretchSpacer(15);
 	report->SetSizer(reportSizer);
-	bottomPanelSizer->Add(report, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(report, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	save = new wxPanel(bottomPanel, wxID_ANY);
+	save = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* saveSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxButton* saveButton = new wxButton(save, wxID_ANY, "Save block");
-	saveSizer->AddStretchSpacer(51);
-	saveSizer->Add(saveButton, 50, wxALIGN_TOP | wxALIGN_RIGHT | wxEXPAND);
-	saveSizer->AddStretchSpacer(51);
+	saveSizer->AddStretchSpacer(1);
+	saveSizer->Add(saveButton, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_BOTTOM));
 	save->SetSizer(saveSizer);
-	bottomPanelSizer->Add(save, 1, wxALIGN_TOP | wxTOP | wxEXPAND);
+	bottomPanelSizer->Add(save, wxSizerFlags(1).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
-	//bottomPanelSizer->AddStretchSpacer(1);
-
-	bottomPanel->SetSizer(bottomPanelSizer);
-
-	testStaticSizer->Add(bottomPanel, 90, wxALIGN_BOTTOM | wxBOTTOM | wxALL | wxEXPAND);
+	testStaticSizer->Add(bottomPanelSizer, 90, wxALIGN_BOTTOM | wxEXPAND);
 
 	SetSizer(testStaticSizer);
 
@@ -266,7 +235,7 @@ TestSetup TestModuleCtrl::GetTestSetup()
 	wxString id = staticLabel.substr(staticLabel.find('#') + 1, staticLabel.length() - staticLabel.find('#'));
 	id.ToLong((long*)&test.id);
 	test.chunk = chunkText->GetValue();
-	test.codec = codecText->GetValue();
+	test.codec = codecText->GetSelection();
 	test.delay = delayText->GetValue();
 	test.destinationIP = destinationIPText->GetValue();
 	test.destinationUDP = destinationUDPText->GetValue();
@@ -288,14 +257,13 @@ TestSetup TestModuleCtrl::GetTestSetup()
 void TestModuleCtrl::LoadTestSetup(const TestSetup& test)
 {
 	testModeChoice->SetSelection(test.choice);
-	//staticLabel.substr(staticLabel.find('#'), staticLabel.length() - staticLabel.find('#')).ToLong((long*)&test.id);
 	chunkText->SetValue(test.chunk);
-	codecText->SetValue(test.codec);
+	codecText->SetSelection(test.codec);
 	delayText->SetValue(test.delay);
 	destinationIPText->SetValue(test.destinationIP);
 	destinationUDPText->SetValue(test.destinationUDP);
 	dscpText->SetValue(test.dscp);
-	dscpCheck->SetValue(test.dscpCheck);
+	dscpCheck->SetValue(test.dscpCheck); OnDSCPCheck(wxCommandEvent());
 	durationText->SetValue(test.duration);
 	enableDSCPCheck->SetValue(test.enableDSCP);
 	listenTCPText->SetValue(test.listenTCP);
@@ -310,16 +278,38 @@ void TestModuleCtrl::LoadTestSetup(const TestSetup& test)
 
 void TestModuleCtrl::OnDSCPCheck(wxCommandEvent& event)
 {
-	//wxMessageBox(wxT("DSCP check"));
-	dscpText->Enable(!dscpText->IsEnabled());
+	dscpText->Enable(dscpCheck->IsChecked());
+}
+
+bool TestModuleCtrl::IsDestinationIPCorrect(const wxString& ip) {
+	wxStringTokenizer tokenizer(ip, ".");
+	int count = 0;
+	while (tokenizer.HasMoreTokens())
+	{
+		wxString token = tokenizer.GetNextToken();
+		long part;
+		if (!token.ToLong(&part)) {
+			return false;
+		}
+		if (part < 0 || part > 255) {
+			return false;
+		}
+		count++;
+	}
+	if (count != 4) {
+		return false;
+	}
+	return true;
 }
 
 void TestModuleCtrl::OnSaveButtonClick(wxCommandEvent& event)
 {
-	//wxMessageBox(wxT("Save block"));
-	//UpdateReportFilename();
 	TestSetup test = GetTestSetup();
-	mainWindow->SaveTestSetup(test);
+	if (!IsDestinationIPCorrect(test.destinationIP)) {
+		wxMessageBox(wxString::Format(wxT("Destination IP '%s' is not valid IP address"), test.destinationIP));
+	} else {
+		mainWindow->SaveTestSetup(test);
+	}
 }
 
 void TestModuleCtrl::UpdateReportFilename()
@@ -327,7 +317,7 @@ void TestModuleCtrl::UpdateReportFilename()
 	wxDateTime time = wxDateTime::Now();
 	switch (testModeChoice->GetSelection()) {
 	case 0:
-		reportText->SetValue(wxString::Format("End-to-End_%s_DSCP%s(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("End-to-End_%s_DSCP%i(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	case 1:
 		reportText->SetValue(wxString::Format("Link-Troubleshoot_%s(%s).htm", destinationIPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
@@ -335,18 +325,18 @@ void TestModuleCtrl::UpdateReportFilename()
 	case 2:
 		break;
 	case 3:
-		reportText->SetValue(wxString::Format("RTP-Transmitter_%s(port%s)(%s).htm", destinationIPText->GetValue(), transmitUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("RTP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	case 4:
 		break;
 	case 5:
-		reportText->SetValue(wxString::Format("TCP-Transmitter_%s(port%s)(%s).htm", destinationIPText->GetValue(), transmitTCPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("TCP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitTCPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	case 6:
-		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%s)(%s).htm", destinationIPText->GetValue(), destinationUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%i)(%s).htm", destinationIPText->GetValue(), destinationUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	case 7:
-		reportText->SetValue(wxString::Format("DSCP-Loss_%s_DSCP%s(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("DSCP-Loss_%s_DSCP%i(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	}
 }
@@ -401,7 +391,6 @@ void TestModuleCtrl::HideAllInputPanels()
 	randUse->Hide();
 	report->Hide();
 	save->Hide();
-	//testStaticSizer->Layout();
 }
 
 void TestModuleCtrl::SetEndToEnd()
@@ -493,7 +482,3 @@ void TestModuleCtrl::SetDscpLoss()
 	save->Show();
 	testStaticSizer->Layout();
 }
-
-//wxStaticBoxSizer* TestModuleCtrl::GetTestSizer() {
-//	return testStaticSizer;
-//}

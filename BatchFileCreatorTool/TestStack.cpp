@@ -3,8 +3,62 @@
 #include <wx/settings.h>
 #include "DndCustom.h"
 
-void TestStack::AppendTestItem(const wxString& text) {
-	stack->InsertItem(stack->GetItemCount(), text);
+vector<int> TestStack::GetItemsOrder() {
+	vector<int> order;
+	int itemsCount = stack->GetItemCount();
+	for (int i = 0; i < itemsCount; i++) {
+		order.push_back(stack->GetItemData(i));
+	}
+	return order;
+}
+
+wxString TestStack::GetAppendStrFormat(const TestSetup& test) {
+	wxString appendStr;
+	switch (test.choice) {
+	case 0:
+		appendStr = wxString::Format("End-to-End to %s DSCP %i", test.destinationIP, test.dscp);
+		break;
+	case 1:
+		appendStr = wxString::Format("Link-Troubleshoot to %s", test.destinationIP);
+		break;
+	case 2:
+		appendStr = wxString::Format("RTP-Receiver from %s(port %i)", test.remote, test.listenUDP);
+		break;
+	case 3:
+		appendStr = wxString::Format("RTP-Transmitter to %s(port %i)", test.destinationIP, test.transmitUDP);
+		break;
+	case 4:
+		appendStr = wxString::Format("TCP-Receiver from %s(port %i)", test.remote, test.listenTCP);
+		break;
+	case 5:
+		appendStr = wxString::Format("TCP-Transmitter to %s(port %i)", test.destinationIP, test.transmitTCP);
+		break;
+	case 6:
+		appendStr = wxString::Format("UDP-Firewall %s(port %i)", test.destinationIP, test.destinationUDP);
+		break;
+	case 7:
+		appendStr = wxString::Format("DSCP-Loss %s DSCP %i", test.destinationIP, test.dscp);
+		break;
+	}
+	return appendStr;
+}
+
+void TestStack::UpdateTestItem(const TestSetup& test) {
+	long selectedItem = stack->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selectedItem == wxNOT_FOUND) {
+		selectedItem = stack->FindItem(-1, (wxUIntPtr)test.id);
+	}
+	if (selectedItem != wxNOT_FOUND) {
+		stack->SetItemText(selectedItem, wxString::Format(wxT("Test #%i: %s"), test.id, GetAppendStrFormat(test)));
+	}
+}
+
+void TestStack::AppendTestItem(const TestSetup& test) {
+	wxListItem item;
+	item.SetId(stack->GetItemCount());
+	item.SetText(wxString::Format(wxT("Test #%i: %s"), test.id, GetAppendStrFormat(test)));
+	item.SetData(test.id);
+	stack->InsertItem(item);
 }
 
 void TestStack::CleanupEmptyLine() {
@@ -26,6 +80,7 @@ void TestStack::OnDrag(wxCoord x, wxCoord y)
 		wxListItem item;
 		item.SetId(i);
 		item.SetText(dragText);
+		item.SetData(dragId);
 		item.SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
 		item.SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
 		stack->InsertItem(item);
@@ -40,8 +95,6 @@ TestStack::TestStack(wxWindow* parent, const wxString& title) : wxPanel(parent, 
 	stack = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_THEME | wxLC_REPORT | wxLC_NO_HEADER | wxLC_SINGLE_SEL);
 
 	stack->DeleteAllColumns();
-
-	labelImageSet = false;
 
 	wxListItem col0;
 	col0.SetId(0);
@@ -59,13 +112,41 @@ TestStack::TestStack(wxWindow* parent, const wxString& title) : wxPanel(parent, 
 
 	stack->SetDropTarget(new DndCustom(this));
 
+	removePopupMenu = new wxMenu();
+	removePopupMenu->Append(wxID_REMOVE, wxT("Remove"));
+
 	Connect(wxID_ANY, wxEVT_SIZE, wxSizeEventHandler(TestStack::OnResize));
 	stack->Connect(wxID_ANY, wxEVT_LIST_BEGIN_DRAG, wxListEventHandler(TestStack::OnBeginDrag), nullptr, this);
 	stack->Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(TestStack::OnItemSelect), nullptr, this);
+	stack->Connect(wxID_ANY, wxEVT_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(TestStack::OnContextMenu), nullptr, this);
+	removePopupMenu->Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TestStack::OnRemoveClick), nullptr, this);
 	//stack->Connect(wxID_ANY, wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TestStack::OnErase), nullptr, this);
 	//stack->Connect(wxID_ANY, wxEVT_PAINT, wxPaintEventHandler(TestStack::OnStackPaint), nullptr, this);
 	//Connect(wxID_ANY, wxEVT_MOTION, wxMouseEventHandler(TestStack::OnMoveDrag));
 	//Connect(wxID_ANY, wxEVT_LEFT_UP, wxMouseEventHandler(TestStack::OnEndDrag));
+}
+
+int TestStack::RemoveSelected() {
+	long selectedItem = stack->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	int removedId = wxNOT_FOUND;
+	if (!(selectedItem == wxNOT_FOUND)) {
+		removedId = stack->GetItemData(selectedItem);
+		stack->DeleteItem(selectedItem);
+	}
+	return removedId;
+}
+
+void TestStack::OnRemoveClick(wxCommandEvent& event) {
+	event.Skip();
+	event.ShouldPropagate();
+}
+
+void TestStack::OnContextMenu(wxListEvent& event) {
+	int i = event.GetId();
+	if (i != wxNOT_FOUND) {
+		stack->SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		stack->PopupMenu(removePopupMenu, event.GetPoint());
+	}
 }
 
 void TestStack::OnItemSelect(wxListEvent& event) {
@@ -76,24 +157,7 @@ void TestStack::OnItemSelect(wxListEvent& event) {
 void TestStack::OnErase(wxEraseEvent& event) {
 }
 
-//void TestStack::OnStackPaint(wxPaintEvent& event) {
-//	long selectedItem = stack->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-//	if (selectedItem == wxNOT_FOUND) {
-//		return;
-//	}
-//
-//	wxRect rect;
-//	if (!stack->GetItemRect(selectedItem, rect, wxLIST_RECT_LABEL)) {
-//		return;
-//	}
-//
-//	wxPaintDC dc(stack);
-//
-//	event.Skip();
-//	event.ShouldPropagate();
-//}
-
-void TestStack::DoSmthng(wxCoord x, wxCoord y, const wxString& str)
+void TestStack::DropItem(wxCoord x, wxCoord y, wxTextDataObject* obj)
 {
 	wxPoint mousePoint(x, y);
 	int lookupflags = wxLIST_HITTEST_ONITEM;
@@ -101,48 +165,27 @@ void TestStack::DoSmthng(wxCoord x, wxCoord y, const wxString& str)
 	if (i == wxNOT_FOUND) {
 		i = stack->GetItemCount();
 	}
-	stack->InsertItem(i, str);
 
-	//stack->InsertItem(stack->GetItemCount(), str);
+	wxListItem item;
+	item.SetId(i);
+	item.SetText(dragText);
+	item.SetData(dragId);
+	stack->InsertItem(item);
 }
 
 void TestStack::OnBeginDrag(wxListEvent& event) {
-
 	long selectedItem = stack->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selectedItem == -1) {
+	if (selectedItem == wxNOT_FOUND) {
 		return;
 	}
 
-	//wxRect rect;
-	//if (!stack->GetItemRect(selectedItem, rect, wxLIST_RECT_LABEL)) {
-	//	return;
-	//}
-
-	//wxClientDC dc(stack);
-
-	//dc.SetFont(stack->GetFont());
-	//int width = dc.GetTextExtent(stack->GetItemText(selectedItem, 0).Append(" ")).GetWidth();
-
-	//wxBitmap bitmap(width, rect.GetHeight());
-	//wxMemoryDC memDC;
-	//memDC.SelectObject(bitmap);
-	//memDC.Blit(0, 0, width, rect.GetHeight(), &dc, rect.GetX(), rect.GetY());
-	//memDC.SelectObject(wxNullBitmap);
-	//labelImage = bitmap.ConvertToImage();
-	//labelImageSet = true;
-
-	dragText = stack->GetItemText(selectedItem, 0);
-
-	wxTextDataObject data;
-	data.SetText(dragText);
+	dragText = stack->GetItemText(selectedItem);
+	dragId = stack->GetItemData(selectedItem);
+	
+	wxTextDataObject textData;
+	textData.SetText(dragText);
 	wxDropSource dragSource(stack);
-	dragSource.SetData(data);
-	//if (labelImageSet) {
-	//	dragSource.SetCursor(wxDragCopy, wxCursor(labelImage));
-	//} else {
-	//	dragSource.SetCursor(wxDragCopy, wxCursor(*wxHOURGLASS_CURSOR));
-	//}
-	//dragSource.SetCursor(wxDragCopy, wxCursor(*wxCROSS_CURSOR));
+	dragSource.SetData(textData);
 
 	stack->DeleteItem(selectedItem);
 	lastAstericsId = wxNOT_FOUND;
@@ -159,10 +202,5 @@ void TestStack::SetCol0Width(int width)
 void TestStack::OnResize(wxSizeEvent& event)
 {
 	SetCol0Width(event.GetSize().GetWidth() - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X));
-	//if (HasScrollbar(wxVERTICAL)) {
-	//	SetCol0Width(event.GetSize().GetWidth() - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X));
-	//} else {
-	//	SetCol0Width(event.GetSize().GetWidth() - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X));
-	//}
 	event.Skip();
 }

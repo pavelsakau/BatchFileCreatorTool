@@ -16,7 +16,7 @@ wxDragResult DndCustom::OnData(wxCoord x, wxCoord y, wxDragResult def)
 		return wxDragNone;
 
 	parent->CleanupEmptyLine();
-	parent->DoSmthng(x, y, ((wxTextDataObject*) GetDataObject())->GetText());
+	parent->DropItem(x, y, (wxTextDataObject*)GetDataObject());
 
 	return def;
 }

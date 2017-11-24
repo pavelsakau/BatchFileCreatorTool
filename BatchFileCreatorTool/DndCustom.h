@@ -18,5 +18,10 @@ public:
 	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);
 };
 
+struct DragData
+{
+	int id;
+	char text[512];
+};
 
 #endif

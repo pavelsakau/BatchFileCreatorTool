@@ -7,6 +7,10 @@
 #include "TestStack.h"
 #include "TestSetup.h"
 #include <map>
+#include <wx/dirdlg.h>
+#include <wx/filefn.h> 
+#include <wx/filename.h>
+#include <wx/ffile.h>
 
 using namespace std;
 
@@ -16,12 +20,11 @@ private:
 	Toolbar* toolbar;
 	TestStack* stack;
 	wxPanel* rightPanelWrapper;
-	wxTextCtrl* serverAddrText;
-	wxTextCtrl* customNumberText;
-	int staticBoxId;
 	int testCounter;
 
 	map<int, TestSetup> testData;
+
+	const int TEST_BORDER_WIDTH = 20;
 
 public:
 	MainWindow(wxWindow *parent,
@@ -36,7 +39,9 @@ public:
 
 	void OnAddButtonClick(wxCommandEvent& event);
 	void OnItemSelect(wxListEvent& event);
-	void ServerAddrTextChanged(wxCommandEvent& event);
+	void OnRemoveClick(wxCommandEvent& event);
+	void PerformPublish(wxFileName cmdFilename);
+	void PerformCopy(wxFileName exeFilename);
 
 	wxString GetNextTestName();
 
@@ -44,6 +49,10 @@ public:
 	void LoadTestSetup(int id);
 
 	void CleanRightPanelSizer();
+
+	wxString GetTestModeParam(int choice);
+	wxString GetCodecParam(int codec);
+	wxString GetPortParam(const TestSetup& test);
 };
 
 #endif

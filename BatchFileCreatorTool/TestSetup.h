@@ -50,13 +50,13 @@ public:
 			filename = wxString::Format("TCP-Transmitter_%s(port%i)(%s).htm", destinationIP, transmitTCP, wxT("%DATE%%TIME%"));
 			break;
 		case 6:
-			filename = wxString::Format("UDP-Firewall_%s(port%i)(%s).htm", destinationIP, destinationUDP, wxT("%DATE%%TIME%"));
+			filename = wxString::Format("UDP-Firewall_%s(port%i)(%s).txt", destinationIP, destinationUDP, wxT("%DATE%%TIME%"));
 			break;
 		case 7:
-			filename = wxString::Format("DSCP-Loss_%s_DSCP%i(%s).htm", destinationIP, dscp, wxT("%DATE%%TIME%"));
+			filename = wxString::Format("DSCP-Loss_%s_DSCP%i(%s).txt", destinationIP, dscp, wxT("%DATE%%TIME%"));
 			break;
 		}
-		return wxString::Format(wxT("\"%s\" "), filename);
+		return wxString::Format(wxT("\"%s\""), filename);
 	}
 };
 

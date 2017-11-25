@@ -8,7 +8,7 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 
 	toolbar = new Toolbar(this, wxT("Toolbar"));
 	toolbar->EnableTool(wxID_EXECUTE, false);
-	vbox->Add(toolbar, 0, wxALIGN_TOP);
+	vbox->Add(toolbar, 0, wxALIGN_TOP | wxEXPAND);
 
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -24,7 +24,7 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 	wxBoxSizer* wrapperSizer =  new wxBoxSizer(wxHORIZONTAL);
 	rightPanelWrapper->SetSizer(wrapperSizer);
 
-	mainSizer->Add(rightPanelWrapper, 2, wxALIGN_LEFT | wxEXPAND);
+	mainSizer->Add(rightPanelWrapper, 4, wxALIGN_LEFT | wxEXPAND);
 
 	vbox->Add(mainSizer, 1, wxEXPAND);
 
@@ -143,8 +143,14 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 			break;
 		}
 
+		wxString license = wxString::Format(wxT("-license %s "), toolbar->GetServerAddrText());
+		wxString customer = wxT("");
+		if (toolbar->IsCustomerNoVisible()) {
+			customer = wxString::Format(wxT("-customer %s "), toolbar->GetCustomerNoText());
+		}
+
 		cmdFile.Write(wxString::Format(wxT("REM ********************************************** Test #%i **********************************************\n"), test.id));
-		cmdFile.Write(wxString::Format(wxT("CallSimulator.exe %s\n\n"), command));
+		cmdFile.Write(wxString::Format(wxT("CallSimulator.exe %s%s%s\n\n"), command, license, customer));
 	}
 
 	cmdFile.Close();

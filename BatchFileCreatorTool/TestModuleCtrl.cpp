@@ -148,9 +148,10 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	dscpCheck = new wxCheckBox(dscp, wxID_ANY, wxT("DSCP Tag"));
 	dscpText = new wxSpinCtrl(dscp, wxID_ANY, wxT("46"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 63, 46);
 	dscpSizer->AddStretchSpacer(50);
-	dscpSizer->Add(dscpCheck, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
-	dscpSizer->AddStretchSpacer(1);
-	dscpSizer->Add(dscpText, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	wxBoxSizer* dscpSizerRight = new wxBoxSizer(wxHORIZONTAL);
+	dscpSizerRight->Add(dscpCheck, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
+	dscpSizerRight->Add(dscpText, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5).Expand());
+	dscpSizer->Add(dscpSizerRight, wxSizerFlags(50).Align(wxALIGN_LEFT).Expand());
 	dscp->SetSizer(dscpSizer);
 	dscpCheck->SetValue(true);
 	bottomPanelSizer->Add(dscp, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
@@ -192,11 +193,11 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	bottomPanelSizer->Add(chunk, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
 	report = new wxPanel(this, wxID_ANY);
-	wxBoxSizer* reportSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer* reportSizer = new wxBoxSizer(wxVERTICAL);
 	wxStaticText* reportLabel = new wxStaticText(report, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	reportText = new wxTextCtrl(report, wxID_ANY, wxT("End-to-End_8.8.8.8.htm"));
-	reportSizer->Add(reportLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
-	reportSizer->Add(reportText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
+	reportSizer->Add(reportLabel, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5).Expand());
+	reportSizer->Add(reportText, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
 	reportText->Enable(false);
 	report->SetSizer(reportSizer);
 	bottomPanelSizer->Add(report, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
@@ -337,10 +338,10 @@ void TestModuleCtrl::UpdateReportFilename()
 		reportText->SetValue(wxString::Format("TCP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitTCPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	case 6:
-		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%i)(%s).htm", destinationIPText->GetValue(), destinationUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%i)(%s).txt", destinationIPText->GetValue(), destinationUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	case 7:
-		reportText->SetValue(wxString::Format("DSCP-Loss_%s_DSCP%i(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("DSCP-Loss_%s_DSCP%i(%s).txt", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
 		break;
 	}
 }

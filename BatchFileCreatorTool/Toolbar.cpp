@@ -19,7 +19,7 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	wxStaticText* serverAddr = new wxStaticText(this, wxID_ANY, wxT("TotalView server address"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
 	box2->Add(serverAddr, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 30));
 	serverAddrText = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
-	box2->Add(serverAddrText, wxSizerFlags(20).Align(wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 10));
+	box2->Add(serverAddrText, wxSizerFlags(10).Align(wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 10));
 
 	customerNumber = new wxStaticText(this, wxID_ANY, wxT("Customer number"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
 	box2->Add(customerNumber, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL	).Border(wxLEFT, 30).ReserveSpaceEvenIfHidden());

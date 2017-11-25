@@ -97,6 +97,8 @@ wxString MainWindow::GetPortParam(const TestSetup& test) {
 
 void MainWindow::PerformPublish(wxFileName cmdFilename) {
 	wxFFile cmdFile(cmdFilename.GetFullPath(), "w");
+	cmdFile.Write(wxT("set CURRENT_DATE=%date:~10,4%-%date:~4,2%-%date:~7,2%\n"));
+	cmdFile.Write(wxT("set CURRENT_TIME=%time:~0,2%-%time:~3,2%-%time:~6,2%\n\n"));
 
 	vector<int> order = stack->GetItemsOrder();
 
@@ -143,9 +145,10 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 			break;
 		}
 
-		wxString license = wxString::Format(wxT("-license %s "), toolbar->GetServerAddrText());
+		wxString license = wxString::Format(wxT("-license %s:%s "), toolbar->GetServerAddrText(), toolbar->GetPortText());
 		wxString customer = wxT("");
 		if (toolbar->IsCustomerNoVisible()) {
+			license = wxT("-license sub01.nlsubscription.com:443 ");
 			customer = wxString::Format(wxT("-customer %s "), toolbar->GetCustomerNoText());
 		}
 

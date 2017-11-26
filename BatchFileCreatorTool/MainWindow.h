@@ -24,7 +24,7 @@ private:
 
 	map<int, TestSetup> testData;
 
-	const int TEST_BORDER_WIDTH = 20;
+	const int TEST_BORDER_WIDTH = 5;
 
 public:
 	MainWindow(wxWindow *parent,
@@ -39,13 +39,15 @@ public:
 
 	void OnAddButtonClick(wxCommandEvent& event);
 	void OnItemSelect(wxListEvent& event);
-	void OnRemoveClick(wxCommandEvent& event);
+	void OnContextMenuClick(wxCommandEvent& event);
 	void PerformPublish(wxFileName cmdFilename);
 	void PerformCopy(wxFileName exeFilename);
 
 	wxString GetNextTestName();
 
 	void SaveTestSetup(const TestSetup& test);
+	void AddTestSetup(const TestSetup& test);
+	void CancelAddOrEdit();
 	void LoadTestSetup(int id);
 
 	void CleanRightPanelSizer();

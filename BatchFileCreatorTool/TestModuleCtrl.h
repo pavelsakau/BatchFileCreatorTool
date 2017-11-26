@@ -11,6 +11,7 @@ class TestModuleCtrl : public wxPanel
 {
 private:
 	MainWindow* mainWindow;
+	bool addMode;
 
 	wxStaticBoxSizer* testStaticSizer;
 	wxChoice* testModeChoice;
@@ -62,10 +63,11 @@ public:
 	static const wxString UDP_FIREWALL_TEST_TEXT;
 	static const wxString DSCP_LOSS_TEST_TEXT;
 
-	TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindowID winid = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL | wxNO_BORDER, const wxString& label = wxEmptyString);
+	TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindowID winid = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL | wxNO_BORDER, const wxString& label = wxEmptyString, bool addMode = true);
 
 	void TestChoiceChanged(wxCommandEvent& event);
 	void OnSaveButtonClick(wxCommandEvent& event);
+	void OnCancelButtonClick(wxCommandEvent& event);
 	void OnDSCPCheck(wxCommandEvent& event);
 	void OnReportNamePartChange(wxCommandEvent& event);
 

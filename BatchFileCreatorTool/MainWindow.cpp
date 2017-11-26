@@ -15,7 +15,6 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 	wxBoxSizer* stackBox = new wxBoxSizer(wxVERTICAL);
 	wxButton* addSimulationTestButton = new wxButton(this, wxID_ANY, "Add simulation test");
 	stack = new TestStack(this, wxT("TestStack"));
-	stackBox->Add(addSimulationTestButton, 0, wxALIGN_CENTER_HORIZONTAL | wxEXPAND);
 	stackBox->Add(stack, 1, wxEXPAND);
 
 	mainSizer->Add(stackBox, 1, wxALIGN_LEFT | wxEXPAND);
@@ -30,12 +29,14 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 
 	SetSizer(vbox);
 
-	addSimulationTestButton->Connect(wxEVT_BUTTON, wxCommandEventHandler(MainWindow::OnAddButtonClick), nullptr, this);
 	Connect(wxID_EXECUTE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainWindow::OnPublish), nullptr, this);
 	Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(MainWindow::OnItemSelect), nullptr, this);
-	Connect(wxID_REMOVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnRemoveClick), nullptr, this);
+	Connect(wxID_REMOVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnContextMenuClick), nullptr, this);
+	Connect(wxID_EDIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnContextMenuClick), nullptr, this);
 
 	testData.clear();
+
+	OnAddButtonClick(wxCommandEvent());
 }
 
 void MainWindow::OnItemSelect(wxListEvent& event)
@@ -50,7 +51,7 @@ void MainWindow::OnAddButtonClick(wxCommandEvent& event) {
 	wxString nextStackName = GetNextTestName();
 
 	Freeze();
-	TestModuleCtrl* testCtrl = new TestModuleCtrl(this, rightPanelWrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, nextStackName);
+	TestModuleCtrl* testCtrl = new TestModuleCtrl(this, rightPanelWrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, nextStackName, true);
 	sizer->Add((wxWindow*)testCtrl, wxSizerFlags(1).Border(wxALL, TEST_BORDER_WIDTH).Expand());
 	sizer->Layout();
 	Thaw();
@@ -97,8 +98,12 @@ wxString MainWindow::GetPortParam(const TestSetup& test) {
 
 void MainWindow::PerformPublish(wxFileName cmdFilename) {
 	wxFFile cmdFile(cmdFilename.GetFullPath(), "w");
-	cmdFile.Write(wxT("set CURRENT_DATE=%date:~10,4%-%date:~4,2%-%date:~7,2%\n"));
-	cmdFile.Write(wxT("set CURRENT_TIME=%time:~0,2%-%time:~3,2%-%time:~6,2%\n\n"));
+	cmdFile.Write(wxT("setlocal enableextensions\n"));
+	cmdFile.Write(wxT("cd /d \"%~dp0\"\n"));
+	cmdFile.Write(wxT("set LeadZeroDate=%date: =0%\n"));
+	cmdFile.Write(wxT("set LeadZeroTime=%time: =0%\n"));
+	cmdFile.Write(wxT("set CURRENT_DATE=%LeadZeroDate:~10,4%-%LeadZeroDate:~4,2%-%LeadZeroDate:~7,2%\n"));
+	cmdFile.Write(wxT("set CURRENT_TIME=%LeadZeroTime:~0,2%-%LeadZeroTime:~3,2%-%LeadZeroTime:~6,2%\n\n"));
 
 	vector<int> order = stack->GetItemsOrder();
 
@@ -187,11 +192,26 @@ wxString MainWindow::GetNextTestName() {
 	return wxString::Format(wxT("Test #%i"), testCounter++);
 }
 
-void MainWindow::OnRemoveClick(wxCommandEvent& event) {
-	int removedId = stack->RemoveSelected();
-	CleanRightPanelSizer();
-	if (testData.find(removedId) != testData.end()) {
-		testData.erase(removedId);
+void MainWindow::OnContextMenuClick(wxCommandEvent& event) {
+
+	if (event.GetId() == wxID_REMOVE) {
+		int removedId = stack->RemoveSelected();
+		CleanRightPanelSizer();
+		if (testData.find(removedId) != testData.end()) {
+			testData.erase(removedId);
+		}
+	} else {
+		LoadTestSetup(stack->GetSelectedId());
+	}
+}
+
+void MainWindow::AddTestSetup(const TestSetup& test)
+{
+	if (testData.find(test.id) == testData.end()) {
+		testData.insert(pair<int, TestSetup>(test.id, test));
+		stack->AppendTestItem(test);
+		toolbar->EnableTool(wxID_EXECUTE, true);
+		OnAddButtonClick(wxCommandEvent());
 	}
 }
 
@@ -200,11 +220,14 @@ void MainWindow::SaveTestSetup(const TestSetup& test)
 	if (testData.find(test.id) != testData.end()) {
 		testData[test.id] = test;
 		stack->UpdateTestItem(test);
-	} else {
-		testData.insert(pair<int, TestSetup>(test.id, test));
-		stack->AppendTestItem(test);
+		toolbar->EnableTool(wxID_EXECUTE, true);
+		OnAddButtonClick(wxCommandEvent());
 	}
-	toolbar->EnableTool(wxID_EXECUTE, true);
+}
+
+void MainWindow::CancelAddOrEdit() 
+{
+	OnAddButtonClick(wxCommandEvent());
 }
 
 void MainWindow::LoadTestSetup(int id)
@@ -214,7 +237,7 @@ void MainWindow::LoadTestSetup(int id)
 		wxSizer* sizer = rightPanelWrapper->GetSizer();
 
 		Freeze();
-		TestModuleCtrl* testCtrl = new TestModuleCtrl(this, rightPanelWrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, wxString::Format(wxT("Test #%i"), id));
+		TestModuleCtrl* testCtrl = new TestModuleCtrl(this, rightPanelWrapper, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER, wxString::Format(wxT("Test #%i"), id), false);
 		sizer->Add((wxWindow*)testCtrl, 1, wxALL | wxEXPAND, TEST_BORDER_WIDTH);
 		sizer->Layout();
 

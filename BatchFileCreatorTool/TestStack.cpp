@@ -100,7 +100,6 @@ TestStack::TestStack(wxWindow* parent, const wxString& title) : wxPanel(parent, 
 	col0.SetId(0);
 	col0.SetText(wxT("Stack Test #"));
 	col0.SetColumn(0);
-	//col0.SetAlign(wxLIST_FORMAT_CENTER); don't work?
 	col0.SetWidth(wxLIST_AUTOSIZE_USEHEADER);
 	stack->InsertColumn(0, col0);
 
@@ -113,17 +112,14 @@ TestStack::TestStack(wxWindow* parent, const wxString& title) : wxPanel(parent, 
 	stack->SetDropTarget(new DndCustom(this));
 
 	removePopupMenu = new wxMenu();
-	removePopupMenu->Append(wxID_REMOVE, wxT("Remove"));
+	removePopupMenu->Append(wxID_EDIT, wxT("Modify test"));
+	removePopupMenu->Append(wxID_REMOVE, wxT("Remove test"));
 
 	Connect(wxID_ANY, wxEVT_SIZE, wxSizeEventHandler(TestStack::OnResize));
 	stack->Connect(wxID_ANY, wxEVT_LIST_BEGIN_DRAG, wxListEventHandler(TestStack::OnBeginDrag), nullptr, this);
 	stack->Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(TestStack::OnItemSelect), nullptr, this);
 	stack->Connect(wxID_ANY, wxEVT_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(TestStack::OnContextMenu), nullptr, this);
-	removePopupMenu->Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TestStack::OnRemoveClick), nullptr, this);
-	//stack->Connect(wxID_ANY, wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(TestStack::OnErase), nullptr, this);
-	//stack->Connect(wxID_ANY, wxEVT_PAINT, wxPaintEventHandler(TestStack::OnStackPaint), nullptr, this);
-	//Connect(wxID_ANY, wxEVT_MOTION, wxMouseEventHandler(TestStack::OnMoveDrag));
-	//Connect(wxID_ANY, wxEVT_LEFT_UP, wxMouseEventHandler(TestStack::OnEndDrag));
+	removePopupMenu->Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TestStack::OnContextMenuClick), nullptr, this);
 }
 
 int TestStack::RemoveSelected() {
@@ -136,9 +132,17 @@ int TestStack::RemoveSelected() {
 	return removedId;
 }
 
-void TestStack::OnRemoveClick(wxCommandEvent& event) {
+void TestStack::OnContextMenuClick(wxCommandEvent& event) {
 	event.Skip();
 	event.ShouldPropagate();
+}
+
+int TestStack::GetSelectedId() {
+	long selectedItem = stack->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selectedItem == wxNOT_FOUND) {
+		return -1;
+	}
+	return stack->GetItemData(selectedItem);
 }
 
 void TestStack::OnContextMenu(wxListEvent& event) {
@@ -150,8 +154,8 @@ void TestStack::OnContextMenu(wxListEvent& event) {
 }
 
 void TestStack::OnItemSelect(wxListEvent& event) {
-	event.Skip();
-	event.ShouldPropagate();
+	//event.Skip();
+	//event.ShouldPropagate();
 }
 
 void TestStack::OnErase(wxEraseEvent& event) {

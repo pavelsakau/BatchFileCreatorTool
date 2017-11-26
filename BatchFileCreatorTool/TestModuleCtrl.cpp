@@ -15,7 +15,7 @@ const wxString TestModuleCtrl::TCP_TRANSMITTER_TEXT = wxT("TCP Transmitter");
 const wxString TestModuleCtrl::UDP_FIREWALL_TEST_TEXT = wxT("UDP Firewall Test");
 const wxString TestModuleCtrl::DSCP_LOSS_TEST_TEXT = wxT("DSCP Loss Test");
 
-TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindowID winid, const wxPoint& pos, const wxSize& size, long style, const wxString& label) : wxPanel(parent, winid, pos, size, style), staticLabel(label), mainWindow(mainWindow)
+TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindowID winid, const wxPoint& pos, const wxSize& size, long style, const wxString& label, bool addMode) : wxPanel(parent, winid, pos, size, style), staticLabel(label), mainWindow(mainWindow), addMode(addMode)
 {
 	wxStaticBox* testStaticBox = new wxStaticBox(this, wxID_ANY, label);
 	testStaticSizer = new wxStaticBoxSizer(testStaticBox, wxVERTICAL);
@@ -204,8 +204,10 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 
 	save = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* saveSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxButton* saveButton = new wxButton(save, wxID_ANY, "Save block");
+	wxButton* saveButton = new wxButton(save, wxID_ANY, addMode ? wxT("Add test") : wxT("Save test"));
+	wxButton* cancelButton = new wxButton(save, wxID_ANY, wxT("Cancel"));
 	saveSizer->AddStretchSpacer(1);
+	saveSizer->Add(cancelButton, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_BOTTOM));
 	saveSizer->Add(saveButton, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_BOTTOM));
 	save->SetSizer(saveSizer);
 	bottomPanelSizer->Add(save, wxSizerFlags(1).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
@@ -216,6 +218,7 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 
 	testModeChoice->Connect(wxEVT_CHOICE, wxCommandEventHandler(TestModuleCtrl::TestChoiceChanged), nullptr, this);
 	saveButton->Connect(wxEVT_BUTTON, wxCommandEventHandler(TestModuleCtrl::OnSaveButtonClick), nullptr, this);
+	cancelButton->Connect(wxEVT_BUTTON, wxCommandEventHandler(TestModuleCtrl::OnCancelButtonClick), nullptr, this);
 	dscpCheck->Connect(wxEVT_CHECKBOX, wxCommandEventHandler(TestModuleCtrl::OnDSCPCheck), nullptr, this);
 	destinationIPText->Connect(wxEVT_TEXT, wxCommandEventHandler(TestModuleCtrl::OnReportNamePartChange), nullptr, this);
 	dscpText->Connect(wxEVT_TEXT, wxCommandEventHandler(TestModuleCtrl::OnReportNamePartChange), nullptr, this);
@@ -307,41 +310,51 @@ bool TestModuleCtrl::IsDestinationIPCorrect(const wxString& ip) {
 	return true;
 }
 
+void TestModuleCtrl::OnCancelButtonClick(wxCommandEvent& event) {
+	mainWindow->CancelAddOrEdit();
+}
+
 void TestModuleCtrl::OnSaveButtonClick(wxCommandEvent& event)
 {
 	TestSetup test = GetTestSetup();
 	if (!IsDestinationIPCorrect(test.destinationIP)) {
 		wxMessageBox(wxString::Format(wxT("Destination IP '%s' is not valid IP address"), test.destinationIP));
 	} else {
-		mainWindow->SaveTestSetup(test);
+		if (addMode) {
+			mainWindow->AddTestSetup(test);
+		} else {
+			mainWindow->SaveTestSetup(test);
+		}
 	}
 }
 
 void TestModuleCtrl::UpdateReportFilename()
 {
 	wxDateTime time = wxDateTime::Now();
+	wxString timeStr = time.FormatISOCombined(' ');
+	timeStr.Replace(wxT(":"), wxT("-"));
 	switch (testModeChoice->GetSelection()) {
 	case 0:
-		reportText->SetValue(wxString::Format("End-to-End_%s_DSCP%i(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("End-to-End_%s_DSCP%i(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), timeStr));
 		break;
 	case 1:
-		reportText->SetValue(wxString::Format("Link-Troubleshoot_%s(%s).htm", destinationIPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("Link-Troubleshoot_%s(%s).htm", destinationIPText->GetValue(), timeStr));
 		break;
 	case 2:
 		break;
 	case 3:
-		reportText->SetValue(wxString::Format("RTP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("RTP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitUDPText->GetValue(), timeStr));
 		break;
 	case 4:
 		break;
 	case 5:
-		reportText->SetValue(wxString::Format("TCP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitTCPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("TCP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitTCPText->GetValue(), timeStr));
 		break;
 	case 6:
-		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%i)(%s).txt", destinationIPText->GetValue(), destinationUDPText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%i)(%s).txt", destinationIPText->GetValue(), destinationUDPText->GetValue(), timeStr));
 		break;
 	case 7:
-		reportText->SetValue(wxString::Format("DSCP-Loss_%s_DSCP%i(%s).txt", destinationIPText->GetValue(), dscpText->GetValue(), time.Format(wxDefaultDateTimeFormat, wxDateTime::Local)));
+		reportText->SetValue(wxString::Format("DSCP-Loss_%s_DSCP%i(%s).txt", destinationIPText->GetValue(), dscpText->GetValue(), timeStr));
 		break;
 	}
 }

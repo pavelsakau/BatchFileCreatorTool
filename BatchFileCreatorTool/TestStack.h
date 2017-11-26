@@ -31,7 +31,8 @@ public:
 	void OnItemSelect(wxListEvent& event);
 
 	void OnContextMenu(wxListEvent& event);
-	void OnRemoveClick(wxCommandEvent& event);
+	void OnContextMenuClick(wxCommandEvent& event);
+	int GetSelectedId();
 
 	void DropItem(wxCoord x, wxCoord y, wxTextDataObject* obj);
 	void OnDrag(wxCoord x, wxCoord y);

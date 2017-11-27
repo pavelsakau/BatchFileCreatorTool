@@ -19,15 +19,19 @@ public:
 	int codec;
 	int numberOfCalls;
 	int dscp;
-	wxString randUse;
 	bool enableDSCP;
 	int duration;
 	int chunk;
 	wxString report;
-
 	bool dscpCheck;
 	bool randUseCheck;
-	bool enableDSCPCheck;
+
+	bool EqualTo(const TestSetup& test) {
+		return (id == test.id && choice == test.choice && destinationIP.compare(test.destinationIP) == 0 && delay == test.delay && remote.compare(test.remote) == 0 && 
+			listenUDP == test.listenUDP && transmitUDP == test.transmitUDP && destinationUDP == test.destinationUDP && listenTCP == test.listenTCP && transmitTCP == test.transmitTCP &&
+			codec == test.codec && numberOfCalls == test.numberOfCalls && dscp == test.dscp && enableDSCP == test.enableDSCP && duration == test.duration && chunk == test.chunk && 
+			dscpCheck == test.dscpCheck && randUseCheck == test.randUseCheck);
+	}
 
 	wxString GetReportFilenameForPublish()
 	{

@@ -12,6 +12,10 @@ vector<int> TestStack::GetItemsOrder() {
 	return order;
 }
 
+int TestStack::GetTestsCount() {
+	return stack->GetItemCount();
+}
+
 wxString TestStack::GetAppendStrFormat(const TestSetup& test) {
 	wxString appendStr;
 	switch (test.choice) {
@@ -116,10 +120,16 @@ TestStack::TestStack(wxWindow* parent, const wxString& title) : wxPanel(parent, 
 	removePopupMenu->Append(wxID_REMOVE, wxT("Remove test"));
 
 	Connect(wxID_ANY, wxEVT_SIZE, wxSizeEventHandler(TestStack::OnResize));
+	stack->Connect(wxID_ANY, wxEVT_LIST_ITEM_DESELECTED, wxListEventHandler(TestStack::OnItemDeselected), nullptr, this);
 	stack->Connect(wxID_ANY, wxEVT_LIST_BEGIN_DRAG, wxListEventHandler(TestStack::OnBeginDrag), nullptr, this);
 	stack->Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(TestStack::OnItemSelect), nullptr, this);
 	stack->Connect(wxID_ANY, wxEVT_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(TestStack::OnContextMenu), nullptr, this);
 	removePopupMenu->Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TestStack::OnContextMenuClick), nullptr, this);
+}
+
+void TestStack::OnItemDeselected(wxListEvent& event) {
+	event.Skip();
+	event.ShouldPropagate();
 }
 
 int TestStack::RemoveSelected() {
@@ -154,8 +164,8 @@ void TestStack::OnContextMenu(wxListEvent& event) {
 }
 
 void TestStack::OnItemSelect(wxListEvent& event) {
-	//event.Skip();
-	//event.ShouldPropagate();
+	event.Skip();
+	event.ShouldPropagate();
 }
 
 void TestStack::OnErase(wxEraseEvent& event) {

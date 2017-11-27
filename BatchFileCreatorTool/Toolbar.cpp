@@ -5,19 +5,19 @@
 
 Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID_ANY)
 {
-	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *hbox = new wxBoxSizer(wxVERTICAL);
 	toolbar = new wxToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL | wxNO_BORDER | wxTB_FLAT | wxTB_NODIVIDER);
 
 	wxBitmap publish(BitmapHelper::GetResourceById(PUBLISHICON), wxBITMAP_TYPE_ICO_RESOURCE);
 
-	wxBoxSizer* toolbarSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* toolbarSizer = new wxBoxSizer(wxHORIZONTAL);
 	toolbar->AddTool(wxID_EXECUTE, wxT("Publish"), publish, wxT("Publish"));
 	toolbar->Connect(wxID_EXECUTE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(Toolbar::OnToolbarClick));
 	toolbar->Realize();
-	toolbarSizer->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Expand());
-	hbox->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxRIGHT, 10));
+	toolbarSizer->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxRIGHT, 10));
+	//hbox->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxRIGHT, 10));
 
-	wxBoxSizer* radioSizer = new wxBoxSizer(wxVERTICAL);
+	//wxBoxSizer* radioSizer = new wxBoxSizer(wxVERTICAL);
 
 	wxBoxSizer* serverAddrSizer = new wxBoxSizer(wxHORIZONTAL);
 	serverRadio = new wxRadioButton(this, wxID_ANY, wxT("TotalView server"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -35,51 +35,67 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 
 	serverAddrSizer->AddStretchSpacer(7);
 
-	radioSizer->Add(serverAddrSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP, 3).Expand());
+	//radioSizer->Add(serverAddrSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP, 3).Expand());
+	toolbarSizer->Add(serverAddrSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP, 3).Expand());
+	hbox->Add(toolbarSizer, wxSizerFlags(0).Align(wxALIGN_TOP).Expand());
 
 	wxBoxSizer* customerSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	wxBoxSizer* buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
+	addTestButton = new wxButton(this, wxID_ADD, "Add");
+	buttonsSizer->Add(addTestButton, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
+	editTestButton = new wxButton(this, wxID_EDIT, "Edit");
+	buttonsSizer->Add(editTestButton, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
+	deleteTestButton = new wxButton(this, wxID_DELETE, "Delete");
+	buttonsSizer->Add(deleteTestButton, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
+	customerSizer->Add(buttonsSizer, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxRIGHT, 5));
+
 	customerRadio = new wxRadioButton(this, wxID_ANY, wxT("Subscription customer number:"), wxDefaultPosition, wxDefaultSize);
 	customerRadioId = customerRadio->GetId();
 	customerSizer->Add(customerRadio, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxRIGHT, 5));
 
 	customerNumberText = new wxTextCtrl(this, wxID_ANY);
-	customerSizer->Add(customerNumberText, wxSizerFlags(5).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
+	customerSizer->Add(customerNumberText, wxSizerFlags(8).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
 
-	customerSizer->AddStretchSpacer(15);
+	customerSizer->AddStretchSpacer(9);
 
-	radioSizer->Add(customerSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP | wxBOTTOM, 3).Expand());
+	//radioSizer->Add(customerSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP | wxBOTTOM, 3).Expand());
 
-	//wxBoxSizer* box2 = new wxBoxSizer(wxHORIZONTAL);
-	//wxStaticText* serverAddr = new wxStaticText(this, wxID_ANY, wxT("TotalView server address"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
-	//box2->Add(serverAddr, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 30));
-	//serverAddrText = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
-	//box2->Add(serverAddrText, wxSizerFlags(10).Align(wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 10));
-
-	//customerNumber = new wxStaticText(this, wxID_ANY, wxT("Customer number"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
-	//box2->Add(customerNumber, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL	).Border(wxLEFT, 30).ReserveSpaceEvenIfHidden());
-	//customerNumberText = new wxTextCtrl(this, wxID_ANY);
-	//box2->Add(customerNumberText, wxSizerFlags(5).Align(wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 10).ReserveSpaceEvenIfHidden());
-
-	//box2->AddStretchSpacer(1);
-
-	//hbox->Add(box2, wxSizerFlags(1).Expand());
-	hbox->Add(radioSizer, wxSizerFlags(1).Expand());
+	//hbox->Add(radioSizer, wxSizerFlags(1).Expand());
+	hbox->Add(customerSizer, wxSizerFlags(0).Border(wxBOTTOM, 3).Expand());
 
 	SetSizer(hbox);
 
-	//serverAddrText->Connect(wxEVT_TEXT, wxCommandEventHandler(Toolbar::ServerAddrTextChanged), nullptr, this);
 	serverRadio->Connect(serverRadioId, wxEVT_RADIOBUTTON, wxCommandEventHandler(Toolbar::RadioClick), nullptr, this);
 	customerRadio->Connect(customerRadioId, wxEVT_RADIOBUTTON, wxCommandEventHandler(Toolbar::RadioClick), nullptr, this);
+	addTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
+	editTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
+	deleteTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
 
 	SetCustomerNoVisible(false);
+	SetEditButtonEnable(false);
+	SetDeleteButtonEnable(false);
+}
+
+void Toolbar::SetEditButtonEnable(bool flag) {
+	editTestButton->Enable(flag);
+}
+
+void Toolbar::SetDeleteButtonEnable(bool flag) {
+	deleteTestButton->Enable(flag);
+}
+
+void Toolbar::OnButtonClick(wxCommandEvent& event) {
+	event.Skip();
+	event.ShouldPropagate();
+}
+
+bool Toolbar::IsToolEnable(int toolid) {
+	return this->toolbar->GetToolEnabled(toolid);
 }
 
 void Toolbar::RadioClick(wxCommandEvent& event) {
 	SetCustomerNoVisible(!(event.GetId() == serverRadioId));
-}
-
-void Toolbar::ServerAddrTextChanged(wxCommandEvent& event) {
-	//SetCustomerNoVisible(wxString("sub01.nlsubscription.com:443").CompareTo(serverAddrText->GetValue()) == 0);
 }
 
 wxString Toolbar::GetServerAddrText() {

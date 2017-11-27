@@ -35,13 +35,21 @@ public:
 		long style = wxDEFAULT_FRAME_STYLE,
 		const wxString& name = wxFrameNameStr);
 
+	void OnClose(wxCloseEvent& event);
 	void OnPublish(wxCommandEvent& event);
+
+	void OnItemDeselected(wxListEvent& event);
+	void AddButtonClick(wxCommandEvent& event);
+	void EditButtonClick(wxCommandEvent& event);
+	void RemoveButtonClick(wxCommandEvent& event);
 
 	void OnAddButtonClick(wxCommandEvent& event);
 	void OnItemSelect(wxListEvent& event);
 	void OnContextMenuClick(wxCommandEvent& event);
 	void PerformPublish(wxFileName cmdFilename);
 	void PerformCopy(wxFileName exeFilename);
+	void PerformDelete();
+	void PerformeEdit();
 
 	wxString GetNextTestName();
 

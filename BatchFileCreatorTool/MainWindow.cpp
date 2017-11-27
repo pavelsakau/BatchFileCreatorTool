@@ -33,15 +33,50 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 	Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(MainWindow::OnItemSelect), nullptr, this);
 	Connect(wxID_REMOVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnContextMenuClick), nullptr, this);
 	Connect(wxID_EDIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnContextMenuClick), nullptr, this);
+	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainWindow::OnClose));
+
+	Connect(wxID_ADD, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::AddButtonClick), nullptr, this);
+	Connect(wxID_EDIT, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::EditButtonClick), nullptr, this);
+	Connect(wxID_DELETE, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::RemoveButtonClick), nullptr, this);
+	Connect(wxID_ANY, wxEVT_LIST_ITEM_DESELECTED, wxListEventHandler(MainWindow::OnItemDeselected), nullptr, this);
 
 	testData.clear();
 
 	OnAddButtonClick(wxCommandEvent());
 }
 
+void MainWindow::AddButtonClick(wxCommandEvent& event) {
+	OnAddButtonClick(wxCommandEvent());
+}
+
+void MainWindow::EditButtonClick(wxCommandEvent& event) {
+	PerformeEdit();
+}
+
+void MainWindow::RemoveButtonClick(wxCommandEvent& event) {
+	PerformDelete();
+}
+
+void MainWindow::OnClose(wxCloseEvent& event) {
+	if (toolbar->IsToolEnable(wxID_EXECUTE) && stack->GetTestsCount() > 0) {
+		if (wxMessageBox(wxT("Do you want to publish before quitting?"), "Quit", wxYES_NO) == wxYES) {
+			OnPublish(wxCommandEvent());
+		}
+	}
+	event.Skip();
+	event.ShouldPropagate();
+}
+
+void MainWindow::OnItemDeselected(wxListEvent& event) {
+	toolbar->SetEditButtonEnable(false);
+	toolbar->SetDeleteButtonEnable(false);
+}
+
 void MainWindow::OnItemSelect(wxListEvent& event)
 {
-	LoadTestSetup(event.GetData());
+	//LoadTestSetup(event.GetData());
+	toolbar->SetEditButtonEnable(true);
+	toolbar->SetDeleteButtonEnable(true);
 }
 
 void MainWindow::OnAddButtonClick(wxCommandEvent& event) {
@@ -163,6 +198,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 
 	cmdFile.Close();
 	wxMessageBox(wxString::Format(wxT("Publish to %s complete"), cmdFilename.GetFullPath()));
+	toolbar->EnableTool(wxID_EXECUTE, false);
 }
 
 void MainWindow::PerformCopy(wxFileName exeFilename) {
@@ -192,16 +228,28 @@ wxString MainWindow::GetNextTestName() {
 	return wxString::Format(wxT("Test #%i"), testCounter++);
 }
 
-void MainWindow::OnContextMenuClick(wxCommandEvent& event) {
-
-	if (event.GetId() == wxID_REMOVE) {
+void MainWindow::PerformDelete() {
+	if (wxMessageBox(wxT("Are you sure?"), "Delete", wxYES_NO) == wxYES) {
 		int removedId = stack->RemoveSelected();
-		CleanRightPanelSizer();
 		if (testData.find(removedId) != testData.end()) {
 			testData.erase(removedId);
 		}
+		OnAddButtonClick(wxCommandEvent());
+		if (stack->GetTestsCount() == 0) {
+			toolbar->EnableTool(wxID_EXECUTE, false);
+		}
+	}
+}
+
+void MainWindow::PerformeEdit() {
+	LoadTestSetup(stack->GetSelectedId());
+}
+
+void MainWindow::OnContextMenuClick(wxCommandEvent& event) {
+	if (event.GetId() == wxID_REMOVE) {
+		PerformDelete();
 	} else {
-		LoadTestSetup(stack->GetSelectedId());
+		PerformeEdit();
 	}
 }
 
@@ -218,9 +266,11 @@ void MainWindow::AddTestSetup(const TestSetup& test)
 void MainWindow::SaveTestSetup(const TestSetup& test)
 {
 	if (testData.find(test.id) != testData.end()) {
+		if (!testData[test.id].EqualTo(test)) {
+			toolbar->EnableTool(wxID_EXECUTE, true);
+		}
 		testData[test.id] = test;
 		stack->UpdateTestItem(test);
-		toolbar->EnableTool(wxID_EXECUTE, true);
 		OnAddButtonClick(wxCommandEvent());
 	}
 }

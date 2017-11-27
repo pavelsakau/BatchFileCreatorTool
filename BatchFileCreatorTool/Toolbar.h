@@ -20,18 +20,24 @@ private:
 	wxRadioButton* customerRadio;
 	wxWindowID serverRadioId;
 	wxWindowID customerRadioId;
+	wxButton* addTestButton;
+	wxButton* editTestButton;
+	wxButton* deleteTestButton;
 
 public:
 	Toolbar(wxWindow* parent, const wxString& title);
 	void OnToolbarClick(wxCommandEvent& event);
 	void EnableTool(int toolid, bool enable);
+	bool IsToolEnable(int toolid);
 	void SetCustomerNoVisible(bool isVisible);
 	bool IsCustomerNoVisible();
 	wxString GetServerAddrText();
 	wxString GetPortText();
 	wxString GetCustomerNoText();
-	void ServerAddrTextChanged(wxCommandEvent& event);
 	void RadioClick(wxCommandEvent& event);
+	void OnButtonClick(wxCommandEvent& event);
+	void SetEditButtonEnable(bool flag);
+	void SetDeleteButtonEnable(bool flag);
 };
 
 #endif

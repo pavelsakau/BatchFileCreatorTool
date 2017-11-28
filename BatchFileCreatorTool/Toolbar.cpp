@@ -22,7 +22,8 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	toolbar->Connect(wxID_ANY, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(Toolbar::OnToolbarClick));
 	toolbar->Realize();
 	//toolbarSizer->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxRIGHT, 10));
-	hbox->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxRIGHT, 10));
+	hbox->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxRIGHT));
+	hbox->AddStretchSpacer(7);
 
 	wxBoxSizer* radioSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -32,6 +33,7 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	serverAddrSizer->Add(serverRadio, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxRIGHT, 5));
 
 	serverAddrText = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
+	serverAddrTextID = serverAddrText->GetId();
 	serverAddrSizer->Add(serverAddrText, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
 
 	//serverAddrSizer->AddStretchSpacer(7);
@@ -56,13 +58,14 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	customerSizer->Add(customerRadio, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxRIGHT, 5));
 
 	customerNumberText = new wxTextCtrl(this, wxID_ANY);
+	customerNumberTextID = customerNumberText->GetId();
 	customerSizer->Add(customerNumberText, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
 
 	//customerSizer->AddStretchSpacer(7);
 
 	radioSizer->Add(customerSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP | wxBOTTOM, 3).Expand());
 
-	hbox->Add(radioSizer, wxSizerFlags(2).Border(wxRIGHT, 3).Expand());
+	hbox->Add(radioSizer, wxSizerFlags(25).Border(wxRIGHT, 3).Expand());
 
 	wxBoxSizer* serverPortSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer* serverAddrSizerL1 = new wxBoxSizer(wxHORIZONTAL);
@@ -70,11 +73,12 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	serverAddrSizerL1->Add(serverPort, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxRIGHT, 5));
 
 	serverPortText = new wxTextCtrl(this, wxID_ANY, wxT("8084"));
+	serverPortTextID = serverPortText->GetId();
 	serverAddrSizerL1->Add(serverPortText, wxSizerFlags(3).Align(wxALIGN_CENTER_VERTICAL).Expand());
 	serverAddrSizerL1->AddStretchSpacer(7);
 	serverPortSizer->Add(serverAddrSizerL1, wxSizerFlags(0).Border(wxTOP | wxBOTTOM, 3).Expand());
 
-	hbox->Add(serverPortSizer, wxSizerFlags(1).Expand());
+	hbox->Add(serverPortSizer, wxSizerFlags(12).Expand());
 
 	//hbox->Add(customerSizer, wxSizerFlags(0).Border(wxBOTTOM, 3).Expand());
 
@@ -84,6 +88,9 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 
 	serverRadio->Connect(serverRadioId, wxEVT_RADIOBUTTON, wxCommandEventHandler(Toolbar::RadioClick), nullptr, this);
 	customerRadio->Connect(customerRadioId, wxEVT_RADIOBUTTON, wxCommandEventHandler(Toolbar::RadioClick), nullptr, this);
+	serverAddrText->Connect(wxID_ANY, wxEVT_TEXT, wxCommandEventHandler(Toolbar::OnTextChange), nullptr, this);
+	serverPortText->Connect(wxID_ANY, wxEVT_TEXT, wxCommandEventHandler(Toolbar::OnTextChange), nullptr, this);
+	customerNumberText->Connect(wxID_ANY, wxEVT_TEXT, wxCommandEventHandler(Toolbar::OnTextChange), nullptr, this);
 	//addTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
 	//editTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
 	//deleteTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
@@ -92,6 +99,23 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	SetAddButtonEnable(false);
 	SetEditButtonEnable(false);
 	SetDeleteButtonEnable(false);
+}
+
+wxWindowID Toolbar::GetServerTextID() {
+	return serverAddrTextID;
+}
+
+wxWindowID Toolbar::GetServerPortID() {
+	return serverPortTextID;
+}
+
+wxWindowID Toolbar::GetCustomerTextID() {
+	return customerNumberTextID;
+}
+
+void Toolbar::OnTextChange(wxCommandEvent& event) {
+	event.Skip();
+	event.ShouldPropagate();
 }
 
 void Toolbar::SetAddButtonEnable(bool flag) {
@@ -120,6 +144,8 @@ bool Toolbar::IsToolEnable(int toolid) {
 
 void Toolbar::RadioClick(wxCommandEvent& event) {
 	SetCustomerNoVisible(!(event.GetId() == serverRadioId));
+	event.Skip();
+	event.ShouldPropagate();
 }
 
 wxString Toolbar::GetServerAddrText() {

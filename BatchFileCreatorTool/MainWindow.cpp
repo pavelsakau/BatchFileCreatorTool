@@ -2,7 +2,7 @@
 #include "TestModuleCtrl.h"
 
 MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title, const wxPoint & pos, const wxSize & size, long style, const wxString & name)
-	: wxFrame(parent, id, title, pos, size, style ^ wxRESIZE_BORDER, name), testCounter(1)
+	: wxFrame(parent, id, title, pos, size, style ^ wxRESIZE_BORDER, name)
 {
 	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
 
@@ -13,7 +13,7 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	wxBoxSizer* stackBox = new wxBoxSizer(wxVERTICAL);
-	wxButton* addSimulationTestButton = new wxButton(this, wxID_ANY, "Add simulation test");
+	//wxButton* addSimulationTestButton = new wxButton(this, wxID_ANY, "Add simulation test");
 	stack = new TestStack(this, wxT("TestStack"));
 	stackBox->Add(stack, 1, wxEXPAND);
 
@@ -43,11 +43,27 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 	//Connect(wxID_EDIT, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::EditButtonClick), nullptr, this);
 	//Connect(wxID_DELETE, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::RemoveButtonClick), nullptr, this);
 	Connect(wxID_ANY, wxEVT_LIST_ITEM_DESELECTED, wxListEventHandler(MainWindow::OnItemDeselected), nullptr, this);
+	Connect(toolbar->GetServerTextID(), wxEVT_TEXT, wxCommandEventHandler(MainWindow::OnTextChange), nullptr, this);
+	Connect(toolbar->GetServerPortID(), wxEVT_TEXT, wxCommandEventHandler(MainWindow::OnTextChange), nullptr, this);
+	Connect(toolbar->GetCustomerTextID(), wxEVT_TEXT, wxCommandEventHandler(MainWindow::OnTextChange), nullptr, this);
+	Connect(wxID_ANY, wxEVT_RADIOBUTTON, wxCommandEventHandler(MainWindow::RadioClick), nullptr, this);
 
 	testData.clear();
 
 	toolbar->EnableTool(wxID_ADD, true);
 	//OnAddButtonClick(wxCommandEvent());
+}
+
+void MainWindow::RadioClick(wxCommandEvent& event) {
+	OnTextChange(wxCommandEvent());
+}
+
+void MainWindow::OnTextChange(wxCommandEvent& event) {
+	if (toolbar->IsCustomerNoVisible()) {
+		toolbar->EnableTool(wxID_EXECUTE, stack->GetTestsCount() > 0 && toolbar->GetCustomerNoText().length() > 0);
+	} else {
+		toolbar->EnableTool(wxID_EXECUTE, stack->GetTestsCount() > 0 && toolbar->GetServerAddrText().length() > 0 && toolbar->GetPortText().length() > 0);
+	}
 }
 
 void MainWindow::AddButtonClick(wxCommandEvent& event) {
@@ -205,6 +221,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 	cmdFile.Close();
 	wxMessageBox(wxString::Format(wxT("Publish to %s complete"), cmdFilename.GetFullPath()));
 	toolbar->EnableTool(wxID_EXECUTE, false);
+	//OnTextChange(wxCommandEvent());
 }
 
 void MainWindow::PerformCopy(wxFileName exeFilename) {
@@ -231,7 +248,7 @@ void MainWindow::OnPublish(wxCommandEvent& event) {
 }
 
 wxString MainWindow::GetNextTestName() {
-	return wxString::Format(wxT("Test #%i"), testCounter++);
+	return wxString::Format(wxT("Test #%i"), stack->GetMaxTestId() + 1);
 }
 
 void MainWindow::PerformDelete() {
@@ -241,9 +258,11 @@ void MainWindow::PerformDelete() {
 			testData.erase(removedId);
 		}
 		//OnAddButtonClick(wxCommandEvent());
+		CleanRightPanelSizer();
 		toolbar->EnableTool(wxID_ADD, true);
 		if (stack->GetTestsCount() == 0) {
-			toolbar->EnableTool(wxID_EXECUTE, false);
+			//toolbar->EnableTool(wxID_EXECUTE, false);
+			OnTextChange(wxCommandEvent());
 		}
 	}
 }
@@ -266,7 +285,8 @@ void MainWindow::AddTestSetup(const TestSetup& test)
 	if (testData.find(test.id) == testData.end()) {
 		testData.insert(pair<int, TestSetup>(test.id, test));
 		stack->AppendTestItem(test);
-		toolbar->EnableTool(wxID_EXECUTE, true);
+		//toolbar->EnableTool(wxID_EXECUTE, true);
+		OnTextChange(wxCommandEvent());
 		toolbar->EnableTool(wxID_ADD, true);
 		CleanRightPanelSizer();
 		//OnAddButtonClick(wxCommandEvent());
@@ -277,7 +297,8 @@ void MainWindow::SaveTestSetup(const TestSetup& test)
 {
 	if (testData.find(test.id) != testData.end()) {
 		if (!testData[test.id].EqualTo(test)) {
-			toolbar->EnableTool(wxID_EXECUTE, true);
+			//toolbar->EnableTool(wxID_EXECUTE, true);
+			OnTextChange(wxCommandEvent());
 		}
 		testData[test.id] = test;
 		stack->UpdateTestItem(test);

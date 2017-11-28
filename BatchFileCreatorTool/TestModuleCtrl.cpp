@@ -207,8 +207,8 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	wxButton* saveButton = new wxButton(save, wxID_ANY, addMode ? wxT("Add test") : wxT("Save test"));
 	wxButton* cancelButton = new wxButton(save, wxID_ANY, wxT("Cancel"));
 	saveSizer->AddStretchSpacer(1);
-	saveSizer->Add(cancelButton, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_BOTTOM));
 	saveSizer->Add(saveButton, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_BOTTOM));
+	saveSizer->Add(cancelButton, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_BOTTOM));
 	save->SetSizer(saveSizer);
 	bottomPanelSizer->Add(save, wxSizerFlags(1).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
@@ -331,11 +331,10 @@ void TestModuleCtrl::OnSaveButtonClick(wxCommandEvent& event)
 void TestModuleCtrl::UpdateReportFilename()
 {
 	wxDateTime time = wxDateTime::Now();
-	wxString timeStr = time.FormatISOCombined(' ');
-	timeStr.Replace(wxT(":"), wxT("-"));
+	wxString timeStr = time.Format(wxT("%Y.%m.%dT%Hh%Mm%Ss"));
 	switch (testModeChoice->GetSelection()) {
 	case 0:
-		reportText->SetValue(wxString::Format("End-to-End_%s_DSCP%i(%s).htm", destinationIPText->GetValue(), dscpText->GetValue(), timeStr));
+		reportText->SetValue(wxString::Format("End-to-End_%s(%s).htm", destinationIPText->GetValue(), timeStr));
 		break;
 	case 1:
 		reportText->SetValue(wxString::Format("Link-Troubleshoot_%s(%s).htm", destinationIPText->GetValue(), timeStr));
@@ -354,7 +353,7 @@ void TestModuleCtrl::UpdateReportFilename()
 		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%i)(%s).txt", destinationIPText->GetValue(), destinationUDPText->GetValue(), timeStr));
 		break;
 	case 7:
-		reportText->SetValue(wxString::Format("DSCP-Loss_%s_DSCP%i(%s).txt", destinationIPText->GetValue(), dscpText->GetValue(), timeStr));
+		reportText->SetValue(wxString::Format("DSCP-Loss_%s(%s).txt", destinationIPText->GetValue(), timeStr));
 		break;
 	}
 }

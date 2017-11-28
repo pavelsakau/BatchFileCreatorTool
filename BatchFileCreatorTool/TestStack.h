@@ -35,6 +35,7 @@ public:
 	void OnItemDeselected(wxListEvent& event);
 	int GetSelectedId();
 	int GetTestsCount();
+	int GetMaxTestId();
 
 	void DropItem(wxCoord x, wxCoord y, wxTextDataObject* obj);
 	void OnDrag(wxCoord x, wxCoord y);

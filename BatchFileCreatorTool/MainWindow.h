@@ -20,7 +20,6 @@ private:
 	Toolbar* toolbar;
 	TestStack* stack;
 	wxPanel* rightPanelWrapper;
-	int testCounter;
 
 	map<int, TestSetup> testData;
 
@@ -63,6 +62,9 @@ public:
 	wxString GetTestModeParam(int choice);
 	wxString GetCodecParam(int codec);
 	wxString GetPortParam(const TestSetup& test);
+
+	void OnTextChange(wxCommandEvent& event);
+	void RadioClick(wxCommandEvent& event);
 };
 
 #endif

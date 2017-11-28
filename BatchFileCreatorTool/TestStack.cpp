@@ -12,6 +12,17 @@ vector<int> TestStack::GetItemsOrder() {
 	return order;
 }
 
+int TestStack::GetMaxTestId() {
+	int itemsCount = stack->GetItemCount();
+	int max = 0;
+	for (int i = 0; i < itemsCount; i++) {
+		if (max < stack->GetItemData(i)) {
+			max = stack->GetItemData(i);
+		}
+	}
+	return max;
+}
+
 int TestStack::GetTestsCount() {
 	return stack->GetItemCount();
 }

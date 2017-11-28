@@ -14,8 +14,11 @@ private:
 	wxStaticText* serverPort;
 	wxStaticText* customerNumber;
 	wxTextCtrl* customerNumberText;
+	wxWindowID customerNumberTextID;
 	wxTextCtrl* serverAddrText;
+	wxWindowID serverAddrTextID;
 	wxTextCtrl* serverPortText;
+	wxWindowID serverPortTextID;
 	wxRadioButton* serverRadio;
 	wxRadioButton* customerRadio;
 	wxWindowID serverRadioId;
@@ -39,6 +42,10 @@ public:
 	void SetAddButtonEnable(bool flag);
 	void SetEditButtonEnable(bool flag);
 	void SetDeleteButtonEnable(bool flag);
+	void OnTextChange(wxCommandEvent& event);
+	wxWindowID GetServerTextID();
+	wxWindowID GetServerPortID();
+	wxWindowID GetCustomerTextID();
 };
 
 #endif

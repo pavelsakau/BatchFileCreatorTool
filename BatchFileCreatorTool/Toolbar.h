@@ -20,9 +20,9 @@ private:
 	wxRadioButton* customerRadio;
 	wxWindowID serverRadioId;
 	wxWindowID customerRadioId;
-	wxButton* addTestButton;
-	wxButton* editTestButton;
-	wxButton* deleteTestButton;
+	//wxButton* addTestButton;
+	//wxButton* editTestButton;
+	//wxButton* deleteTestButton;
 
 public:
 	Toolbar(wxWindow* parent, const wxString& title);
@@ -36,6 +36,7 @@ public:
 	wxString GetCustomerNoText();
 	void RadioClick(wxCommandEvent& event);
 	void OnButtonClick(wxCommandEvent& event);
+	void SetAddButtonEnable(bool flag);
 	void SetEditButtonEnable(bool flag);
 	void SetDeleteButtonEnable(bool flag);
 };

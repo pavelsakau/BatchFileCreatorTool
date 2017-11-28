@@ -75,5 +75,14 @@
     <Image Include="icons\publish.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="icons\add.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icons\edit.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icons\minus.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

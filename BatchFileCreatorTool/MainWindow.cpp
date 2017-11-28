@@ -30,23 +30,29 @@ MainWindow::MainWindow(wxWindow * parent, wxWindowID id, const wxString & title,
 	SetSizer(vbox);
 
 	Connect(wxID_EXECUTE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainWindow::OnPublish), nullptr, this);
+	Connect(wxID_ADD, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainWindow::AddButtonClick), nullptr, this);
+	Connect(wxID_EDIT, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainWindow::EditButtonClick), nullptr, this);
+	Connect(wxID_REMOVE, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(MainWindow::RemoveButtonClick), nullptr, this);
+
 	Connect(wxID_ANY, wxEVT_LIST_ITEM_SELECTED, wxListEventHandler(MainWindow::OnItemSelect), nullptr, this);
 	Connect(wxID_REMOVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnContextMenuClick), nullptr, this);
 	Connect(wxID_EDIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnContextMenuClick), nullptr, this);
 	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainWindow::OnClose));
 
-	Connect(wxID_ADD, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::AddButtonClick), nullptr, this);
-	Connect(wxID_EDIT, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::EditButtonClick), nullptr, this);
-	Connect(wxID_DELETE, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::RemoveButtonClick), nullptr, this);
+	//Connect(wxID_ADD, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::AddButtonClick), nullptr, this);
+	//Connect(wxID_EDIT, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::EditButtonClick), nullptr, this);
+	//Connect(wxID_DELETE, wxEVT_BUTTON, wxCommandEventHandler(MainWindow::RemoveButtonClick), nullptr, this);
 	Connect(wxID_ANY, wxEVT_LIST_ITEM_DESELECTED, wxListEventHandler(MainWindow::OnItemDeselected), nullptr, this);
 
 	testData.clear();
 
-	OnAddButtonClick(wxCommandEvent());
+	toolbar->EnableTool(wxID_ADD, true);
+	//OnAddButtonClick(wxCommandEvent());
 }
 
 void MainWindow::AddButtonClick(wxCommandEvent& event) {
 	OnAddButtonClick(wxCommandEvent());
+	toolbar->EnableTool(wxID_ADD, false);
 }
 
 void MainWindow::EditButtonClick(wxCommandEvent& event) {
@@ -234,7 +240,8 @@ void MainWindow::PerformDelete() {
 		if (testData.find(removedId) != testData.end()) {
 			testData.erase(removedId);
 		}
-		OnAddButtonClick(wxCommandEvent());
+		//OnAddButtonClick(wxCommandEvent());
+		toolbar->EnableTool(wxID_ADD, true);
 		if (stack->GetTestsCount() == 0) {
 			toolbar->EnableTool(wxID_EXECUTE, false);
 		}
@@ -242,6 +249,7 @@ void MainWindow::PerformDelete() {
 }
 
 void MainWindow::PerformeEdit() {
+	toolbar->EnableTool(wxID_ADD, false);
 	LoadTestSetup(stack->GetSelectedId());
 }
 
@@ -259,7 +267,9 @@ void MainWindow::AddTestSetup(const TestSetup& test)
 		testData.insert(pair<int, TestSetup>(test.id, test));
 		stack->AppendTestItem(test);
 		toolbar->EnableTool(wxID_EXECUTE, true);
-		OnAddButtonClick(wxCommandEvent());
+		toolbar->EnableTool(wxID_ADD, true);
+		CleanRightPanelSizer();
+		//OnAddButtonClick(wxCommandEvent());
 	}
 }
 
@@ -271,13 +281,17 @@ void MainWindow::SaveTestSetup(const TestSetup& test)
 		}
 		testData[test.id] = test;
 		stack->UpdateTestItem(test);
-		OnAddButtonClick(wxCommandEvent());
+		//OnAddButtonClick(wxCommandEvent());
+		CleanRightPanelSizer();
+		toolbar->EnableTool(wxID_ADD, true);
 	}
 }
 
 void MainWindow::CancelAddOrEdit() 
 {
-	OnAddButtonClick(wxCommandEvent());
+	//OnAddButtonClick(wxCommandEvent());
+	CleanRightPanelSizer();
+	toolbar->EnableTool(wxID_ADD, true);
 }
 
 void MainWindow::LoadTestSetup(int id)

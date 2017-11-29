@@ -16,8 +16,8 @@ int TestStack::GetMaxTestId() {
 	int itemsCount = stack->GetItemCount();
 	int max = 0;
 	for (int i = 0; i < itemsCount; i++) {
-		if (max < stack->GetItemData(i)) {
-			max = stack->GetItemData(i);
+		if (max < (int)stack->GetItemData(i)) {
+			max = (int)stack->GetItemData(i);
 		}
 	}
 	return max;

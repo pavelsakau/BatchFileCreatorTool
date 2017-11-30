@@ -160,7 +160,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 	cmdFile.Write(wxT("set LeadZeroDate=%date: =0%\n"));
 	cmdFile.Write(wxT("set LeadZeroTime=%time: =0%\n"));
 	cmdFile.Write(wxT("set CURRENT_DATE=%LeadZeroDate:~10,4%-%LeadZeroDate:~4,2%-%LeadZeroDate:~7,2%\n"));
-	cmdFile.Write(wxT("set CURRENT_TIME=%LeadZeroTime:~0,2%-%LeadZeroTime:~3,2%-%LeadZeroTime:~6,2%\n\n"));
+	cmdFile.Write(wxT("set CURRENT_TIME=%LeadZeroTime:~0,2%h%LeadZeroTime:~3,2%m%LeadZeroTime:~6,2%s\n\n"));
 
 	vector<int> order = stack->GetItemsOrder();
 
@@ -173,6 +173,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 		wxString delay = wxString::Format(wxT("-delay %i "), test.delay);
 		wxString port = wxString::Format("-port %s ", GetPortParam(test));
 		wxString dscp = test.dscpCheck ? wxString::Format(wxT("-dscp %i "), test.dscp) : wxT("");
+		wxString t_mos_duration = test.isMos ? wxString::Format(wxT("-q %.2f "), test.mos) : wxT("");
 		wxString t_duration = wxString::Format(wxT("-t %i "), test.duration);
 		wxString tcpchunk = wxString::Format(wxT("-tcpchunk %i "), test.chunk);
 		wxString tcprandom = test.randUseCheck ? wxT("-tcprandom ") : wxT("");
@@ -182,7 +183,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 		wxString command;
 		switch (test.choice) {
 		case 0:
-			command = mode + a_address + c_codec + n_calls + dscp + t_duration + f_filename + s_silent;
+			command = mode + a_address + c_codec + n_calls + dscp + t_mos_duration + t_duration + f_filename + s_silent;
 			break;
 		case 1:
 			command = mode + a_address + delay + t_duration + f_filename + s_silent;
@@ -191,7 +192,7 @@ void MainWindow::PerformPublish(wxFileName cmdFilename) {
 			command = mode + port + s_silent; // RTP Receiver: remote name and enable dscp not used
 			break;
 		case 3:
-			command = mode + a_address + c_codec + n_calls + dscp + t_duration + port + f_filename + s_silent;
+			command = mode + a_address + c_codec + n_calls + dscp + t_mos_duration + t_duration + port + f_filename + s_silent;
 			break;
 		case 4:
 			command = mode + port + s_silent; // TCP Receiver: remote name not used

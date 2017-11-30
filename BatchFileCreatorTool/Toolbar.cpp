@@ -13,7 +13,6 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	wxBitmap editicon(BitmapHelper::GetResourceById(ICONEDIT), wxBITMAP_TYPE_ICO_RESOURCE);
 	wxBitmap minusicon(BitmapHelper::GetResourceById(ICONMINUS), wxBITMAP_TYPE_ICO_RESOURCE);
 
-	//wxBoxSizer* toolbarSizer = new wxBoxSizer(wxHORIZONTAL);
 	toolbar->SetToolBitmapSize(wxSize(46, 46));
 	toolbar->AddTool(wxID_EXECUTE, wxT("Publish"), publish, wxT("Publish"));
 	toolbar->AddTool(wxID_ADD, wxT("Add"), addicon, wxT("Add test"));
@@ -21,7 +20,6 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	toolbar->AddTool(wxID_REMOVE, wxT("Delete"), minusicon, wxT("Delete test"));
 	toolbar->Connect(wxID_ANY, wxEVT_COMMAND_TOOL_CLICKED, wxCommandEventHandler(Toolbar::OnToolbarClick));
 	toolbar->Realize();
-	//toolbarSizer->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxRIGHT, 10));
 	hbox->Add(toolbar, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxRIGHT));
 	hbox->AddStretchSpacer(7);
 
@@ -36,22 +34,9 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	serverAddrTextID = serverAddrText->GetId();
 	serverAddrSizer->Add(serverAddrText, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
 
-	//serverAddrSizer->AddStretchSpacer(7);
-
 	radioSizer->Add(serverAddrSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP, 3).Expand());
-	//toolbarSizer->Add(serverAddrSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP, 3).Expand());
-	//hbox->Add(toolbarSizer, wxSizerFlags(0).Align(wxALIGN_TOP).Expand());
 
 	wxBoxSizer* customerSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	//wxBoxSizer* buttonsSizer = new wxBoxSizer(wxHORIZONTAL);
-	//addTestButton = new wxButton(this, wxID_ADD, "Add");
-	//buttonsSizer->Add(addTestButton, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
-	//editTestButton = new wxButton(this, wxID_EDIT, "Edit");
-	//buttonsSizer->Add(editTestButton, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
-	//deleteTestButton = new wxButton(this, wxID_DELETE, "Delete");
-	//buttonsSizer->Add(deleteTestButton, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
-	//customerSizer->Add(buttonsSizer, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxRIGHT, 5));
 
 	customerRadio = new wxRadioButton(this, wxID_ANY, wxT("Subscription customer number:"), wxDefaultPosition, wxDefaultSize);
 	customerRadioId = customerRadio->GetId();
@@ -60,8 +45,6 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 	customerNumberText = new wxTextCtrl(this, wxID_ANY);
 	customerNumberTextID = customerNumberText->GetId();
 	customerSizer->Add(customerNumberText, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
-
-	//customerSizer->AddStretchSpacer(7);
 
 	radioSizer->Add(customerSizer, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_TOP).Border(wxTOP | wxBOTTOM, 3).Expand());
 
@@ -80,20 +63,13 @@ Toolbar::Toolbar(wxWindow* parent, const wxString& title) : wxPanel(parent, wxID
 
 	hbox->Add(serverPortSizer, wxSizerFlags(12).Expand());
 
-	//hbox->Add(customerSizer, wxSizerFlags(0).Border(wxBOTTOM, 3).Expand());
-
 	SetSizer(hbox);
-	//wxMessageBox(wxString::Format("%i - %i", toolbar->GetSize().GetHeight(), this->GetSize().GetHeight()));
-	//toolbar->SetSize(wxSize(toolbar->GetSize().GetWidth(), this->GetSize().GetHeight()));
 
 	serverRadio->Connect(serverRadioId, wxEVT_RADIOBUTTON, wxCommandEventHandler(Toolbar::RadioClick), nullptr, this);
 	customerRadio->Connect(customerRadioId, wxEVT_RADIOBUTTON, wxCommandEventHandler(Toolbar::RadioClick), nullptr, this);
 	serverAddrText->Connect(wxID_ANY, wxEVT_TEXT, wxCommandEventHandler(Toolbar::OnTextChange), nullptr, this);
 	serverPortText->Connect(wxID_ANY, wxEVT_TEXT, wxCommandEventHandler(Toolbar::OnTextChange), nullptr, this);
 	customerNumberText->Connect(wxID_ANY, wxEVT_TEXT, wxCommandEventHandler(Toolbar::OnTextChange), nullptr, this);
-	//addTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
-	//editTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
-	//deleteTestButton->Connect(wxID_ANY, wxEVT_BUTTON, wxCommandEventHandler(Toolbar::OnButtonClick), nullptr, this);
 
 	SetCustomerNoVisible(false);
 	SetAddButtonEnable(false);

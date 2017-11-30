@@ -29,9 +29,12 @@ private:
 	wxPanel* dscp;
 	wxPanel* randUse;
 	wxPanel* enableDSCP;
+	wxPanel* durationMOS;
 	wxPanel* duration;
 	wxPanel* chunk;
 	wxPanel* report;
+	wxPanel* reportWithRadio;
+	wxPanel* reportWithRadio2;
 	wxPanel* save;
 	wxCheckBox* dscpCheck;
 	wxCheckBox* randUseCheck;
@@ -47,10 +50,30 @@ private:
 	wxSpinCtrl* transmitTCPText;
 	wxChoice* codecText;
 	wxSpinCtrl* numberOfCallsText;
+	wxSpinCtrlDouble* durationMOSText;
 	wxSpinCtrl* durationText;
 	wxSpinCtrl* chunkText;
 	wxTextCtrl* reportText;
+	wxTextCtrl* reportWithRadioText;
+	wxTextCtrl* reportWithRadioText2;
+	wxCheckBox* mosCheck;
 	wxSpinCtrl* dscpText;
+
+	//wxRadioButton* radioTypesHTML;
+	//wxRadioButton* radioTypesDOCX;
+	//wxRadioButton* radioTypesCSV;
+	//wxRadioButton* radioTypesALL;
+
+	//wxRadioButton* radioTypesHTML2;
+	//wxRadioButton* radioTypesCSV2;
+	//wxRadioButton* radioTypesALL2;
+
+	wxCheckBox* radioTypesHTML;
+	wxCheckBox* radioTypesDOCX;
+	wxCheckBox* radioTypesCSV;
+
+	wxCheckBox* radioTypesHTML2;
+	wxCheckBox* radioTypesCSV2;
 
 public:
 
@@ -70,12 +93,15 @@ public:
 	void OnCancelButtonClick(wxCommandEvent& event);
 	void OnDSCPCheck(wxCommandEvent& event);
 	void OnReportNamePartChange(wxCommandEvent& event);
+	void OnMosCheckbox(wxCommandEvent& event);
+	void OnRadio1Click(wxCommandEvent& event);
+	void OnRadio2Click(wxCommandEvent& event);
 
 	void HideAllInputPanels();
 	void SetEndToEnd();
 	void SetLinkTroubleshooting();
 	void SetRtpReceiver();
-	void SetTrpTransmitter();
+	void SetRtpTransmitter();
 	void SetTcpReceiver();
 	void SetTcpTransmitter();
 	void SetUdpFirewall();
@@ -83,6 +109,7 @@ public:
 
 	void UpdateReportFilename();
 	bool IsDestinationIPCorrect(const wxString& ip);
+	bool WasTestExtensionChosen();
 
 	TestSetup GetTestSetup();
 	void LoadTestSetup(const TestSetup& test);

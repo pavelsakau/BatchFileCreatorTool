@@ -174,9 +174,24 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	enableDSCPCheck->SetValue(true);
 	bottomPanelSizer->Add(enableDSCP, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
+	durationMOS = new wxPanel(this, wxID_ANY);
+	wxBoxSizer* durationMOSSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText* durationMOSLabel = new wxStaticText(durationMOS, wxID_ANY, wxT("Quit if MOS score drops below"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	durationMOSSizer->Add(durationMOSLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
+	wxBoxSizer* durationMOSSizerRight = new wxBoxSizer(wxHORIZONTAL);
+	mosCheck = new wxCheckBox(durationMOS, wxID_ANY, wxT("MOS"));
+	durationMOSSizerRight->Add(mosCheck, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxRIGHT, 5));
+	durationMOSText = new wxSpinCtrlDouble(durationMOS, wxID_ANY, wxT("4.0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1.0, 4.4, 4.0, 0.1);
+	durationMOSText->SetDigits(2);
+	durationMOSText->Enable(false);
+	durationMOSSizerRight->Add(durationMOSText, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	durationMOSSizer->Add(durationMOSSizerRight, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
+	durationMOS->SetSizer(durationMOSSizer);
+	bottomPanelSizer->Add(durationMOS, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
+
 	duration = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* durationSizer = new wxBoxSizer(wxHORIZONTAL);
-	wxStaticText* durationLabel = new wxStaticText(duration, wxID_ANY, wxT("Duration"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	wxStaticText* durationLabel = new wxStaticText(duration, wxID_ANY, wxT("Duration (seconds)"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	durationText = new wxSpinCtrl(duration, wxID_ANY, wxT("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000000, 300);
 	durationSizer->Add(durationLabel, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5));
 	durationSizer->Add(durationText, wxSizerFlags(50).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL));
@@ -197,10 +212,82 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	wxStaticText* reportLabel = new wxStaticText(report, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
 	reportText = new wxTextCtrl(report, wxID_ANY, wxT("End-to-End_8.8.8.8.htm"));
 	reportSizer->Add(reportLabel, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5).Expand());
-	reportSizer->Add(reportText, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	reportSizer->Add(reportText, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxTOP, 5).Expand());
 	reportText->Enable(false);
 	report->SetSizer(reportSizer);
 	bottomPanelSizer->Add(report, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
+
+	//reportWithRadio = new wxPanel(this, wxID_ANY);
+	//wxBoxSizer* reportWithRadioSizer = new wxBoxSizer(wxVERTICAL);
+	//wxBoxSizer* radioReportTypesSizer = new wxBoxSizer(wxHORIZONTAL);
+	//wxStaticText* reportWithRadioLabel = new wxStaticText(reportWithRadio, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	//reportWithRadioText = new wxTextCtrl(reportWithRadio, wxID_ANY, wxT("End-to-End_8.8.8.8"));
+	//radioReportTypesSizer->Add(reportWithRadioLabel, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5).Expand());
+	//radioTypesHTML = new wxRadioButton(reportWithRadio, wxID_ANY, wxT("HTML"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	//radioTypesDOCX = new wxRadioButton(reportWithRadio, wxID_ANY, wxT("DOCX"));
+	//radioTypesCSV = new wxRadioButton(reportWithRadio, wxID_ANY, wxT("CSV"));
+	//radioTypesALL = new wxRadioButton(reportWithRadio, wxID_ANY, wxT("ALL"));
+	//radioReportTypesSizer->Add(radioTypesHTML, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	//radioReportTypesSizer->Add(radioTypesDOCX, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	//radioReportTypesSizer->Add(radioTypesCSV, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	//radioReportTypesSizer->Add(radioTypesALL, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	//reportWithRadioSizer->Add(radioReportTypesSizer, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	//reportWithRadioSizer->Add(reportWithRadioText, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	//reportWithRadioText->Enable(false);
+	//reportWithRadio->SetSizer(reportWithRadioSizer);
+	//bottomPanelSizer->Add(reportWithRadio, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
+
+	//reportWithRadio2 = new wxPanel(this, wxID_ANY);
+	//wxBoxSizer* reportWithRadioSizer2 = new wxBoxSizer(wxVERTICAL);
+	//wxBoxSizer* radioReportTypesSizer2 = new wxBoxSizer(wxHORIZONTAL);
+	//wxStaticText* reportWithRadioLabel2 = new wxStaticText(reportWithRadio2, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	//reportWithRadioText2 = new wxTextCtrl(reportWithRadio2, wxID_ANY, wxT("End-to-End_8.8.8.8"));
+	//radioReportTypesSizer2->Add(reportWithRadioLabel2, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5).Expand());
+	//radioTypesHTML2 = new wxRadioButton(reportWithRadio2, wxID_ANY, wxT("HTML"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	//radioTypesCSV2 = new wxRadioButton(reportWithRadio2, wxID_ANY, wxT("CSV"));
+	//radioTypesALL2 = new wxRadioButton(reportWithRadio2, wxID_ANY, wxT("ALL"));
+	//radioReportTypesSizer2->Add(radioTypesHTML2, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	//radioReportTypesSizer2->Add(radioTypesCSV2, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	//radioReportTypesSizer2->Add(radioTypesALL2, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	//reportWithRadioSizer2->Add(radioReportTypesSizer2, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	//reportWithRadioSizer2->Add(reportWithRadioText2, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	//reportWithRadioText2->Enable(false);
+	//reportWithRadio2->SetSizer(reportWithRadioSizer2);
+	//bottomPanelSizer->Add(reportWithRadio2, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
+
+	reportWithRadio = new wxPanel(this, wxID_ANY);
+	wxBoxSizer* reportWithRadioSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* radioReportTypesSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText* reportWithRadioLabel = new wxStaticText(reportWithRadio, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	reportWithRadioText = new wxTextCtrl(reportWithRadio, wxID_ANY, wxT("End-to-End_8.8.8.8"));
+	radioReportTypesSizer->Add(reportWithRadioLabel, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5).Expand());
+	radioTypesHTML = new wxCheckBox(reportWithRadio, wxID_ANY, wxT("HTML")); radioTypesHTML->SetValue(true);
+	radioTypesDOCX = new wxCheckBox(reportWithRadio, wxID_ANY, wxT("DOCX"));
+	radioTypesCSV = new wxCheckBox(reportWithRadio, wxID_ANY, wxT("CSV"));
+	radioReportTypesSizer->Add(radioTypesHTML, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	radioReportTypesSizer->Add(radioTypesDOCX, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	radioReportTypesSizer->Add(radioTypesCSV, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	reportWithRadioSizer->Add(radioReportTypesSizer, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	reportWithRadioSizer->Add(reportWithRadioText, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxTOP, 5).Expand());
+	reportWithRadioText->Enable(false);
+	reportWithRadio->SetSizer(reportWithRadioSizer);
+	bottomPanelSizer->Add(reportWithRadio, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
+
+	reportWithRadio2 = new wxPanel(this, wxID_ANY);
+	wxBoxSizer* reportWithRadioSizer2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* radioReportTypesSizer2 = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText* reportWithRadioLabel2 = new wxStaticText(reportWithRadio2, wxID_ANY, wxT("Report file name"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+	reportWithRadioText2 = new wxTextCtrl(reportWithRadio2, wxID_ANY, wxT("End-to-End_8.8.8.8"));
+	radioReportTypesSizer2->Add(reportWithRadioLabel2, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxLEFT, 5).Expand());
+	radioTypesHTML2 = new wxCheckBox(reportWithRadio2, wxID_ANY, wxT("HTML")); radioTypesHTML2->SetValue(true);
+	radioTypesCSV2 = new wxCheckBox(reportWithRadio2, wxID_ANY, wxT("CSV"));
+	radioReportTypesSizer2->Add(radioTypesHTML2, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	radioReportTypesSizer2->Add(radioTypesCSV2, wxSizerFlags(0).Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL));
+	reportWithRadioSizer2->Add(radioReportTypesSizer2, wxSizerFlags(1).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Expand());
+	reportWithRadioSizer2->Add(reportWithRadioText2, wxSizerFlags(0).Align(wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL).Border(wxTOP, 5).Expand());
+	reportWithRadioText2->Enable(false);
+	reportWithRadio2->SetSizer(reportWithRadioSizer2);
+	bottomPanelSizer->Add(reportWithRadio2, wxSizerFlags(0).Align(wxALIGN_TOP).Border(wxTOP, 10).Expand());
 
 	save = new wxPanel(this, wxID_ANY);
 	wxBoxSizer* saveSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -225,6 +312,14 @@ TestModuleCtrl::TestModuleCtrl(MainWindow* mainWindow, wxWindow *parent, wxWindo
 	transmitUDPText->Connect(wxEVT_TEXT, wxCommandEventHandler(TestModuleCtrl::OnReportNamePartChange), nullptr, this);
 	transmitTCPText->Connect(wxEVT_TEXT, wxCommandEventHandler(TestModuleCtrl::OnReportNamePartChange), nullptr, this);
 	destinationUDPText->Connect(wxEVT_TEXT, wxCommandEventHandler(TestModuleCtrl::OnReportNamePartChange), nullptr, this);
+	mosCheck->Connect(wxEVT_CHECKBOX, wxCommandEventHandler(TestModuleCtrl::OnMosCheckbox), nullptr, this);
+	//radioTypesHTML->Connect(radioTypesHTML->GetId(), wxEVT_RADIOBUTTON, wxCommandEventHandler(TestModuleCtrl::OnRadio1Click), nullptr, this);
+	//radioTypesDOCX->Connect(radioTypesDOCX->GetId(), wxEVT_RADIOBUTTON, wxCommandEventHandler(TestModuleCtrl::OnRadio1Click), nullptr, this);
+	//radioTypesCSV->Connect(radioTypesCSV->GetId(), wxEVT_RADIOBUTTON, wxCommandEventHandler(TestModuleCtrl::OnRadio1Click), nullptr, this);
+	//radioTypesALL->Connect(radioTypesALL->GetId(), wxEVT_RADIOBUTTON, wxCommandEventHandler(TestModuleCtrl::OnRadio1Click), nullptr, this);
+	//radioTypesHTML2->Connect(radioTypesHTML2->GetId(), wxEVT_RADIOBUTTON, wxCommandEventHandler(TestModuleCtrl::OnRadio2Click), nullptr, this);
+	//radioTypesCSV2->Connect(radioTypesCSV2->GetId(), wxEVT_RADIOBUTTON, wxCommandEventHandler(TestModuleCtrl::OnRadio2Click), nullptr, this);
+	//radioTypesALL2->Connect(radioTypesALL2->GetId(), wxEVT_RADIOBUTTON, wxCommandEventHandler(TestModuleCtrl::OnRadio2Click), nullptr, this);
 
 	UpdateReportFilename();
 	HideAllInputPanels();
@@ -259,6 +354,15 @@ TestSetup TestModuleCtrl::GetTestSetup()
 	test.report = reportText->GetValue();
 	test.transmitTCP = transmitTCPText->GetValue();
 	test.transmitUDP = transmitUDPText->GetValue();
+
+	test.isMos = mosCheck->GetValue();
+	test.mos = durationMOSText->GetValue();
+	test.report1_HTML = radioTypesHTML->GetValue();
+	test.report1_DOCX = radioTypesDOCX->GetValue();
+	test.report1_CSV = radioTypesCSV->GetValue();
+	test.report2_HTML = radioTypesHTML2->GetValue();
+	test.report2_CSV = radioTypesCSV2->GetValue();
+
 	return test;
 }
 
@@ -282,6 +386,27 @@ void TestModuleCtrl::LoadTestSetup(const TestSetup& test)
 	reportText->SetValue(test.report);
 	transmitTCPText->SetValue(test.transmitTCP);
 	transmitUDPText->SetValue(test.transmitUDP);
+
+	mosCheck->SetValue(test.isMos);
+	durationMOSText->Enable(test.isMos);
+	durationMOSText->SetValue(test.mos);
+	radioTypesHTML->SetValue(test.report1_HTML);
+	radioTypesDOCX->SetValue(test.report1_DOCX);
+	radioTypesCSV->SetValue(test.report1_CSV);
+	radioTypesHTML2->SetValue(test.report2_HTML);
+	radioTypesCSV2->SetValue(test.report2_CSV);
+}
+
+void TestModuleCtrl::OnRadio1Click(wxCommandEvent& event) {
+	UpdateReportFilename();
+}
+
+void TestModuleCtrl::OnRadio2Click(wxCommandEvent& event) {
+	UpdateReportFilename();
+}
+
+void TestModuleCtrl::OnMosCheckbox(wxCommandEvent& event) {
+	durationMOSText->Enable(event.IsChecked());
 }
 
 void TestModuleCtrl::OnDSCPCheck(wxCommandEvent& event)
@@ -314,11 +439,23 @@ void TestModuleCtrl::OnCancelButtonClick(wxCommandEvent& event) {
 	mainWindow->CancelAddOrEdit();
 }
 
+bool TestModuleCtrl::WasTestExtensionChosen() {
+	int testmode = testModeChoice->GetSelection();
+	if (testmode == 0 || testmode == 3) {
+		return radioTypesHTML->GetValue() || radioTypesDOCX->GetValue() || radioTypesCSV->GetValue();
+	} else if (testmode == 1) {
+		return radioTypesHTML2->GetValue() || radioTypesCSV2->GetValue();
+	}
+	return true;
+}
+
 void TestModuleCtrl::OnSaveButtonClick(wxCommandEvent& event)
 {
 	TestSetup test = GetTestSetup();
 	if (!IsDestinationIPCorrect(test.destinationIP)) {
 		wxMessageBox(wxString::Format(wxT("Destination IP '%s' is not valid IP address"), test.destinationIP));
+	} else if (!WasTestExtensionChosen()) {
+		wxMessageBox(wxT("Please choose report file name extension"));
 	} else {
 		if (addMode) {
 			mainWindow->AddTestSetup(test);
@@ -332,22 +469,29 @@ void TestModuleCtrl::UpdateReportFilename()
 {
 	wxDateTime time = wxDateTime::Now();
 	wxString timeStr = time.Format(wxT("%Y.%m.%dT%Hh%Mm%Ss"));
+	//wxString extension = wxT("");
+	//if (radioTypesHTML->GetValue()) { extension = wxT(".html"); } else if (radioTypesDOCX->GetValue()) { extension = wxT(".docx"); } else if (radioTypesCSV->GetValue()) { extension = wxT(".csv"); }
+	//wxString extension2 = wxT("");
+	//if (radioTypesHTML2->GetValue()) { extension2 = wxT(".html"); } else if (radioTypesCSV2->GetValue()) { extension2 = wxT(".csv"); }
 	switch (testModeChoice->GetSelection()) {
 	case 0:
-		reportText->SetValue(wxString::Format("End-to-End_%s(%s).htm", destinationIPText->GetValue(), timeStr));
+		//reportWithRadioText->SetValue(wxString::Format("End-to-End_%s(%s)%s", destinationIPText->GetValue(), timeStr, extension));
+		reportWithRadioText->SetValue(wxString::Format("End-to-End_%s(%s)", destinationIPText->GetValue(), timeStr));
 		break;
 	case 1:
-		reportText->SetValue(wxString::Format("Link-Troubleshoot_%s(%s).htm", destinationIPText->GetValue(), timeStr));
+		//reportWithRadioText2->SetValue(wxString::Format("Link-Troubleshoot_%s(%s)%s", destinationIPText->GetValue(), timeStr, extension2));
+		reportWithRadioText2->SetValue(wxString::Format("Link-Troubleshoot_%s(%s)", destinationIPText->GetValue(), timeStr));
 		break;
 	case 2:
 		break;
 	case 3:
-		reportText->SetValue(wxString::Format("RTP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitUDPText->GetValue(), timeStr));
+		//reportWithRadioText->SetValue(wxString::Format("RTP-Transmitter_%s(port%i)(%s)%s", destinationIPText->GetValue(), transmitUDPText->GetValue(), timeStr, extension));
+		reportWithRadioText->SetValue(wxString::Format("RTP-Transmitter_%s(port%i)(%s)", destinationIPText->GetValue(), transmitUDPText->GetValue(), timeStr));
 		break;
 	case 4:
 		break;
 	case 5:
-		reportText->SetValue(wxString::Format("TCP-Transmitter_%s(port%i)(%s).htm", destinationIPText->GetValue(), transmitTCPText->GetValue(), timeStr));
+		reportText->SetValue(wxString::Format("TCP-Transmitter_%s(port%i)(%s).html", destinationIPText->GetValue(), transmitTCPText->GetValue(), timeStr));
 		break;
 	case 6:
 		reportText->SetValue(wxString::Format("UDP-Firewall_%s(port%i)(%s).txt", destinationIPText->GetValue(), destinationUDPText->GetValue(), timeStr));
@@ -372,7 +516,7 @@ void TestModuleCtrl::TestChoiceChanged(wxCommandEvent& event)
 		SetRtpReceiver();
 		break;
 	case 3:
-		SetTrpTransmitter();
+		SetRtpTransmitter();
 		break;
 	case 4:
 		SetTcpReceiver();
@@ -403,10 +547,13 @@ void TestModuleCtrl::HideAllInputPanels()
 	numberOfCalls->Hide();
 	dscp->Hide();
 	enableDSCP->Hide();
+	durationMOS->Hide();
 	duration->Hide();
 	chunk->Hide();
 	randUse->Hide();
 	report->Hide();
+	reportWithRadio->Hide();
+	reportWithRadio2->Hide();
 	save->Hide();
 }
 
@@ -417,8 +564,9 @@ void TestModuleCtrl::SetEndToEnd()
 	codec->Show();
 	numberOfCalls->Show();
 	dscp->Show();
+	durationMOS->Show();
 	duration->Show();
-	report->Show();
+	reportWithRadio->Show();
 	save->Show();
 	testStaticSizer->Layout();
 }
@@ -429,7 +577,7 @@ void TestModuleCtrl::SetLinkTroubleshooting()
 	destinationIP->Show();
 	delay->Show();
 	duration->Show();
-	report->Show();
+	reportWithRadio2->Show();
 	save->Show();
 	testStaticSizer->Layout();
 }
@@ -444,7 +592,7 @@ void TestModuleCtrl::SetRtpReceiver()
 	testStaticSizer->Layout();
 }
 
-void TestModuleCtrl::SetTrpTransmitter()
+void TestModuleCtrl::SetRtpTransmitter()
 {
 	HideAllInputPanels();
 	destinationIP->Show();
@@ -452,8 +600,9 @@ void TestModuleCtrl::SetTrpTransmitter()
 	codec->Show();
 	numberOfCalls->Show();
 	dscp->Show();
+	durationMOS->Show();
 	duration->Show();
-	report->Show();
+	reportWithRadio->Show();
 	save->Show();
 	testStaticSizer->Layout();
 }

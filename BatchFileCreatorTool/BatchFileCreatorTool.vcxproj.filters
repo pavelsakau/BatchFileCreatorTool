@@ -84,5 +84,11 @@
     <Image Include="icons\minus.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="icons\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icons\CallSimBatchTool.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

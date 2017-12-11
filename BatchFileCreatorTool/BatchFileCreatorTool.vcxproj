@@ -173,7 +173,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icons\add.ico" />
+    <Image Include="icons\CallSimBatchTool.ico" />
     <Image Include="icons\edit.ico" />
+    <Image Include="icons\icon1.ico" />
     <Image Include="icons\minus.ico" />
     <Image Include="icons\publish.ico" />
   </ItemGroup>
